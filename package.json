@@ -1,0 +1,25 @@
+{
+	"name": "startup-boilerplate",
+	"description": "node.js, backbone, socket.IO, mongoDB, with Auth and other excitment backed in!r",
+	"version": "0.0.1",
+	"homepage": "http://github.com/andrewtennison/startup-boilerplate",
+	"repository": {
+		"type": "git",
+		"url": "git@github.com:andrewtennison/startup-boilerplate.git"
+	},
+	"main":"boilerplate",
+	"author": "Andrew Tennison <andrew@tennisons.com>",	
+	"engines" : {
+		"node" : "0.6"
+	},
+	"dependencies" : { 
+		"express" : "2.5.0",
+		"ejs" : ">=0.3.1",
+		"socket.io" : ">=0.6.16",
+		"mongoose" : ">=2.5",
+		"expresso" : ">=0.7.3",
+		"should" : ">=0.0.4",					
+		"aws-lib" : ">= 0.0.5",
+		"node-logging" : "0.1.3"
+	}
+}

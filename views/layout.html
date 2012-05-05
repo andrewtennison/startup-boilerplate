@@ -1,0 +1,64 @@
+<!doctype html >
+
+<html class="no-js" xmlns:fb="http://www.facebook.com/2008/fbml" >
+<!-- manifest="/onsideManifest.appcache" -->
+
+<head>
+	<meta charset="utf-8">
+
+	<title></title>
+	<meta name="description" content="">
+	<meta name="author" content="">
+
+	<!-- Mobile viewport optimization http://goo.gl/z0PA8 -->
+	<meta name="HandheldFriendly" content="True">
+	<meta name="MobileOptimized" content="320">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no;">	
+	
+	<!-- Home screen icon	Mathias Bynens http://goo.gl/6nVq0 -->
+	<!-- For iPhone 4 with high-resolution Retina display: -->
+	<link rel="apple-touch-icon-precomposed" sizes="114x114" href="/i/icons/h/apple-touch-icon.png">
+	<!-- For first-generation iPad: -->
+	<link rel="apple-touch-icon-precomposed" sizes="72x72" href="/i/icons/m/apple-touch-icon.png">
+	<!-- For non-Retina iPhone, iPod Touch, and Android 2.1+ devices: -->
+	<link rel="apple-touch-icon-precomposed" href="/i/icons/l/apple-touch-icon-precomposed.png">
+	<!-- For nokia devices: -->
+	<link rel="shortcut icon" href="i/icons/l/apple-touch-icon.png">
+
+	<!-- iOS web app, deletable if not needed -->
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+	<!-- 320x460 for iPhone 3GS -->
+	<link rel="apple-touch-startup-image" media="(max-device-width: 480px) and not (-webkit-min-device-pixel-ratio: 2)" href="i/icons/startup.png">
+	<!-- 640x920 for retina display -->
+	<link rel="apple-touch-startup-image" media="(max-device-width: 480px) and (-webkit-min-device-pixel-ratio: 2)" href="i/icons/startup-retina.png">
+	<!-- iPad Portrait 768x1004 -->
+	<link rel="apple-touch-startup-image" media="(min-device-width: 768px) and (orientation: portrait)" href="i/icons/startup-tablet-portrait.png">
+	<!-- iPad Landscape 1024x748 -->
+	<link rel="apple-touch-startup-image" media="(min-device-width: 768px) and (orientation: landscape)" href="i/icons/startup-tablet-landscape.png">
+	
+	<!-- The script prevents links from opening in mobile safari. https://gist.github.com/1042026 -->
+	<script>(function(a,b,c){if(c in b&&b[c]){var d,e=a.location,f=/^(a|html)$/i;a.addEventListener("click",function(a){d=a.target;while(!f.test(d.nodeName))d=d.parentNode;"href"in d&&(d.href.indexOf("http")||~d.href.indexOf(e.host))&&(a.preventDefault(),e.href=d.href)},!1)}})(document,window.navigator,"standalone")</script>
+	
+	<!-- Mobile IE allows us to activate ClearType technology for smoothing fonts for easy reading -->
+	<meta http-equiv="cleartype" content="on">
+
+	<!-- facebook opengraph metatags -->
+	<meta property="og:site_name" content="Onside.me"/>
+	<meta property="og:type" content="news"/>
+	<meta property="og:image" content="http://onside.me/i/placeholder/listicons.png"/>
+	<meta property="og:title" content=""/>
+	<meta property="og:url" content="http://onside.me/"/-->
+
+	<!-- Main Stylesheet -->
+	
+</head>
+
+<body>
+	HELLO WORLD
+	
+	<%- body %>
+	
+</body>
+</html>
