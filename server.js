@@ -1,11 +1,16 @@
 
 var app,
-	app_root 	= __dirname,
-	fs 			= require('fs'),
+	app_root	= __dirname,
+	app_port	= 3000,
+	fs			= require('fs'),
 	express		= require('express'),
 	util		= require('util'),
-	mongoose 	= require('mongoose'),
-	logging 	= require('node-logging');
+	mongoose	= require('mongoose'),
+	logging		= require('node-logging'),
+	stylus		= require('stylus'),
+	nib			= require('nib'),
+	passport	= require('passport'),
+	LocalStrategy = require('passport-local').Strategy;
 
 	mongoose.connect('mongodb://localhost/boilerplate');
 
@@ -29,12 +34,20 @@ exports.boot = function(params){
 
 
 function bootApplication(app) {	 
-
 	app.use(express.bodyParser());
 	app.use(express.methodOverride());
 	app.use(express.cookieParser());
 	app.use(express.session({ secret: 'changeSecret' }));
 //	app.use(express.session({store: new MemcachedStore({ hosts: ['127.0.0.1:11211'] }), secret: 'changeSecret' }));
+	app.use(passport.initialize());
+	app.use(passport.session());
+
+	app.use(stylus.middleware({
+		src: __dirname + '/public',
+		compile: function (str, path) {
+			return stylus(str).set('filename', path).set('compress', true).use(nib());
+		}
+	}));
 
 	app.use(express.static(app_root + '/public'));
 	app.use(app.router);
@@ -75,11 +88,15 @@ function bootApplication(app) {
 	});
 }
 
+function compile(str, path) {
+	return stylus(str)
+	.set('filename', path)
+	.set('compress', true)
+	.use(nib());
+}
 
 //Bootstrap models 
 function bootModels(app) {
-	console.log('bootModels')
-
 	fs.readdir(app_root + '/models', function(err, files){
 		if (err) throw err;
 		files.forEach(function(file){
@@ -94,7 +111,6 @@ function bootModels(app) {
 
 // Bootstrap controllers
 function bootControllers(app) {
-	console.log('bootControllers')
 	fs.readdir(app_root + '/controllers', function(err, files){
 		if (err) throw err;
 		files.forEach(function(file){			
@@ -107,28 +123,28 @@ function bootControllers(app) {
 }
 
 function bootModel(app, file) {
-	console.log('bootModel - '+file)
 	var name = file.replace('.js', ''),
 		schema = require(app_root + '/models/'+ name);				// Include the mongoose file
 }
 
 // Load the controller, link to its view file from here
 function bootController(app, file) {
-	console.log('bootController - ' + file)
 	var name = file.replace('.js', ''),
 		controller = app_root + '/controllers/' + name,	 // full controller to include
 		template = name.replace('Controller','').toLowerCase();	// template folder for html - remove the ...Controller part.
-	
-	console.log('controller = '+controller)
-	console.log('template = '+template)
+
+	// console.log('bootController')
+	// console.log('name = '+name)
+	// console.log('controller = '+controller)
+	// console.log('template = '+template)
 	
 	// Include the controller
-	// require(controller)(app,template);			// Include
+	//require(controller)(app,template);			// Include
 }
 
 
 // allow normal node loading if appropriate
 if (!module.parent) {
-	exports.boot().listen(3000);
+	exports.boot().listen(app_port);
 	console.log("Express server %s listening on port %d", express.version, app.address().port)
 }

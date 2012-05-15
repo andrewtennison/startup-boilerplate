@@ -1,0 +1,11 @@
+
+<h1>Editing Test <%= test.name %></h1>
+<%- partial('../messages') %>
+<form method="post" action="/test/<%= test.id %>">
+  <input type="hidden" name="_method" value="put" />
+  <p>Name: <input type="text" name="test[name]", value="<%= test.name %>" /></p>
+  <p>
+  	<button class="button-submit" type="submit" value="Update">Save</button>
+  	<a class="button-cancel" href="/test/<%= test.id %>">Cancel</a>
+  </p>
+</form>

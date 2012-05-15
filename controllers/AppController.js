@@ -1,18 +1,26 @@
-var fs = require('fs')
-	, inflection = require('../lib/inflection');
+var fs = require('fs'),
+	inflection = require('../lib/inflection');
+	
 
 module.exports = function(app) {
 	
 	// app.get("/favicon.ico", function() {}); // Required if you delete the favicon.ico from public
 	
+	app.get('/auth/:action/:callback', authRouter, authCallback);
+	app.get('/auth/:action', authRouter);
+	app.get('/logout', function(req, res){
+		req.logOut();
+		res.redirect('/');
+	});
+	
 	// Plural
-	app.get("/:controller?", router);								// Index
-	app.get("/:controller.:format?", router);				// Index
-	app.get("/:controller/:from-:to.:format?", router);		// Index
+	app.get("/:controller?", router);					// Index
+	app.get("/:controller.:format?", router);			// Index
+	app.get("/:controller/:from-:to.:format?", router);	// Index
 	
 	// Plural Create & Delete
-	app.post("/:controller", router);			// Create
-	app.del("/:controller", router);	 			// Delete all
+	app.post("/:controller", router);					// Create
+	app.del("/:controller", router);	 				// Delete all
 	
 	// Singular - different variable to clarify routing
 	app.get("/:controller/:id.:format?", router);		// To support controller/index	
@@ -22,9 +30,86 @@ module.exports = function(app) {
 	
 }
 
-///
+//app.get("/:controller?", ensureAuthenticated, router);
+function ensureAuthenticated(req, res, next) {
+	if (req.isAuthenticated()) { return next(); }
+	res.redirect('/', {message:'not logged in', status:401})
+}
+
+function authCallback(req, res){
+	authRouter(req, res, false)
+}
+/*
+function authCallback(req, res){
+	var controller = 'auth';
+	var action = req.params.action ? req.params.action : '';
+	var callback = req.params.callback ? req.params.callback : '';
+	var fn = 'index';
+
+	// Default route
+	if(controller.length == 0) return;
+	
+	fn = (callback)? 'callback' : 'index';
+	fn += action.capitalize() + 'Callback';
+
+	console.log('callback controller = ' + './' + controller.capitalize() + 'Controller >> ' + fn)
+
+	try {
+		var path = './' + controller.capitalize() + 'Controller',
+			controllerLibrary = require(path);
+			
+		if(typeof controllerLibrary[fn] === 'function') {
+			console.log('call '+path+' function')
+			controllerLibrary[fn](req,res);		
+		} else {
+			console.log(path+' not function')
+			return;
+		}
+	} catch (e) {
+		return;
+	}
+	
+}
+*/
+function authRouter(req, res, next){
+	var controller = 'auth';
+	var action = req.params.action ? req.params.action : '';
+	var callback = req.params.callback ? req.params.callback : '';
+	var method = req.method.toLowerCase();
+	var fn = 'index';
+
+	console.log('controllerLibrary = ./' + controller.capitalize() + 'Controller')
+	
+	// Default route
+	if(controller.length == 0) {
+		index(req,res,next);
+		return;
+	};
+	
+	fn = (callback)? 'callback' : 'index';
+	fn += action.capitalize();
+	if(!next) fn += 'Callback';
+
+	console.log('controller = ' + './' + controller.capitalize() + 'Controller >> ' + fn)
+
+	try {
+		var path = './' + controller.capitalize() + 'Controller',
+			controllerLibrary = require(path);
+
+		if(typeof controllerLibrary[fn] === 'function') {
+			console.log('call '+path+' function')
+			controllerLibrary[fn](req,res,next);		
+		} else {
+			console.log(path+' not function')
+			if(next){res.render('404')}else{return};
+		}
+	} catch (e) {
+		console.log(e)
+		if(next){res.render('404')}else{return};
+	}
+};
+
 function router(req, res, next) {
-		
 	var controller = req.params.controller ? req.params.controller : '';
 	var action = req.params.action ? req.params.action : '';
 	var id = req.params.id ? req.params.id : '';
@@ -96,6 +181,7 @@ function router(req, res, next) {
  * @param req
  * @param res
  */
+
 function index(req, res, next) {
 		 
 	/**
@@ -109,15 +195,14 @@ function index(req, res, next) {
 	fs.readdir(__dirname + '/', function(err, files){
 
 		if (err) throw err;
-			
+
 		files.forEach(function(file){
 			if(file != "AppController.js") {
 				controllers.push(file.replace('Controller.js','').toLowerCase());
 			}
 		});
-			
-		console.log(controllers)
-		res.render('app',{controllers:controllers});
+
+		res.render('app',{controllers:controllers, user: req.user});
 	
 	});	
 };

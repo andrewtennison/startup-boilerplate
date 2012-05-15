@@ -1,1 +1,7 @@
-<h1>user</h1>
+<h1>user ?? </h1>
+
+<% if(users) { %>
+	<p><%- JSON.stringify(users) %></p>
+<% } else { %>
+	<p>no users</p>
+<% } %>

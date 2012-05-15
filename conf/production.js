@@ -9,7 +9,12 @@ module.exports = function(app,express) {
 	//app.all('/robots.txt', function(req,res) {res.send('User-agent: *', {'Content-Type': 'text/plain'});});
 
 	app.config = {
-		env: 'production'
+		env: 'production',
+		
+		facebook: {
+			app_id:'237429156359045',
+			app_secret:'47162acfe0016699b9b5c4eb6cada390'
+		}
 	}
 	
 }

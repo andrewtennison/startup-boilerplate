@@ -17,9 +17,16 @@
 		"ejs" : ">=0.3.1",
 		"socket.io" : ">=0.6.16",
 		"mongoose" : ">=2.5",
-		"expresso" : ">=0.7.3",
+		"mongoose-types" : "",
+		"expresso" : ">=0.9",
 		"should" : ">=0.0.4",					
 		"aws-lib" : ">= 0.0.5",
-		"node-logging" : "0.1.3"
+		"node-logging" : "0.1.3",
+		"passport" : "0.1.8",
+		"passport-local" : "",
+		"passport-facebook" : "",
+		"bcrypt" : "",
+		"stylus" : "",
+		"nib" : ""
 	}
 }

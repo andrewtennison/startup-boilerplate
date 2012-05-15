@@ -17,7 +17,8 @@ var version = '0.1.2';
 /**
  * Require everything in the library folder
  */
-require.paths.unshift(__dirname + '/lib');
+//require.paths.unshift(__dirname + '/lib');
+NODE_PATH=__dirname + '/lib';
 
 /**
  * Explicit module dependencies
@@ -34,12 +35,12 @@ var bootstrapPath = __dirname;
  * Main Command router
  */
 var appLauncher = {
-					command:'cluster',
-				    server: { port:3000 },
-				    script: { name:'help',
-				    		  params: []
-				    		}
-				   };
+	command:'cluster',
+    server: { port:3000 },
+    script: { name:'help',
+    		  params: []
+    		}
+   };
 
 for(var i in process.argv) {
 	// Skip the first two - Node and app.js path
@@ -62,14 +63,14 @@ function runLauncher(appLauncher) {
 	
 	// Check if this is a bootstrap application?
 	if(isLibrary()) {
-		console.log('\x1b[1mDo not run this from the bootstrap library folder, please run from an empty directory or a bootstrapped app, or please run "npm install"\x1b[0m\r\n');		
-		return;
+		//console.log('\x1b[1mDo not run this from the bootstrap library folder, please run from an empty directory or a bootstrapped app, or please run "npm install"\x1b[0m\r\n');		
+		//return;
 	}
 	
 	// Check if this is a bootstrap application?
 	if(!isBootstrap() && appLauncher.command != 'create-app') {
-		console.log('\x1b[1mApplication not bootstrapped - you must run:\x1b[0m eb create-app\r\n');
-		return;
+		//console.log('\x1b[1mApplication not bootstrapped - you must run:\x1b[0m eb create-app\r\n');
+		//return;
 	}
 	
 	switch(appLauncher.command) {
@@ -164,8 +165,10 @@ function runTests(appLauncher) {
 	}
 	
 	test.forEach(function (item, index) {
-		exec('expresso -I . -s tests/' + item + '/* ', { timeout: 60000, cwd:path }, function (error, stdout, stderr) {
+		//exec('NODE_PATH=lib expresso . -s tests/' + item + '/* ', { timeout: 20000, cwd:path }, function (error, stdout, stderr) {
+		exec('mocha -u exports -t 8000 -d tests/' + item + '/* ', { timeout: 20000, cwd:path }, function (error, stdout, stderr) {
 			console.log("Finished test: " + item);
+	    	//console.log(error);
 	    	console.log(stdout);
 	    	console.log(stderr);
     	});

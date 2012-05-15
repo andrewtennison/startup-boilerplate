@@ -1,0 +1,60 @@
+
+<h1>Viewing test</h1>
+<script type="text/javascript">
+	$(function(){
+
+		// Delete User
+		$('.button-delete').click(function(){
+			
+			var testId = this.id;
+			
+			$("#dialog-confirm" ).dialog({
+				resizable: false,
+				height:180,
+				width:400,
+				modal: true,
+				buttons: {
+					"Delete": function() {
+						$( this ).dialog( "close" );
+						$.ajax({
+							   type: "DELETE",
+							   url: "/test/" + testId,				   
+							   success: function(msg) {				   	  
+								  window.location.replace("/tests");
+							   },
+							   error: function(msg) {					  
+								  alert("I was unable to delete the test - something has gone wrong, apologies!");
+							   }
+						});
+					},
+					Cancel: function() {
+						$( this ).dialog( "close" );
+					}
+				}
+			});			
+			
+		});
+		
+	});
+</script>
+<div id="dialog-confirm" style="display: none;" title="Delete test?">
+	<p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>This will be permanently deleted and cannot be recovered. Are you sure?</p>
+</div>
+<%- partial('../messages') %>
+<table>
+	<tr>
+  		<th>ID</th><td><%= test.id %></td>
+  	</tr>
+  	<tr>
+  		<th>Name</th><td><%= test.name %></td>
+  	</tr> 	
+</table>
+<a class="button-edit" href="<%= test.id %>/edit" title="Edit test ...">
+	Edit 
+</a>
+<button class="button-delete" id="<%= test.id %>"  title="Delete test ...">
+	Delete
+</button>
+<a class="button-home" href="/tests" title="List Tests">
+	List Tests
+</a>

@@ -3,7 +3,7 @@
  *  Users Controller
  *  Created by create-controller script @ Fri Mar 11 2011 21:16:50 GMT+0000 (GMT)
  **/
- var mongoose = require('mongoose'),	
+var mongoose = require('mongoose'),	
 	User = mongoose.model('User'),
 	ViewTemplatePath = 'user';
 
@@ -21,38 +21,10 @@ module.exports = {
 	 **/
 	index: function(req, res, next) {
 		console.log('UserController.index')
-		  	/*
-		  var from = req.params.from ? parseInt(req.params.from) - 1 : 0;
-		  var to = req.params.to ? parseInt(req.params.to) : 10;
-	      var total = 0;
-	      
-	      User.count({}, function (err, count) {
-	    	total = count;  
-	    	var pagerHtml = pager.render(from,to,total,'/users');    	
-	                  
-			  User.find({})
-			  	.sort('name', 1)
-			  	.skip(from).limit(to)
-			  	.find(function (err, users) {
-				
-				  if(err) return next(err);
-				  
-			      switch (req.params.format) {
-			        case 'json':	          
-			          res.send(users.map(function(u) {
-			              return u.toObject();
-			          }));
-			          break;
-		
-			        default:			        	
-			        	res.render(ViewTemplatePath,{users:users,pagerHtml:pagerHtml});
-			      }
-			      
-			  });
-	      
-	      });
-	      	*/  	
-	      	res.render(ViewTemplatePath);
+		console.log(req.session)
+		User.find({}, function (err, docs) {
+			res.render(ViewTemplatePath, {users : docs});
+		});
 	},
 	
 	/**
