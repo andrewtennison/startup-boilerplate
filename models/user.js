@@ -23,7 +23,9 @@ var User = new Schema({
 		last: { type: String, required: true }
 	},
 	displayName: { type: String },
-	gender: {type: String},	
+	gender: {type: String},
+	
+	// Facebook	
 	fb_uid: {type:String, unique: true, index: true},
 	fb: {},
 	fb_friends: {},
@@ -31,7 +33,9 @@ var User = new Schema({
 	
 	friends: [Friends],
 	visits: {type: Number, default: 0},
-	isNew: {type: Boolean, default: true}
+	isNew: {type: Boolean, default: true},
+	
+	status:[] // array of obj { scale:'', distance:'', time:'', end:'calc endTime as time + scale' }
 });
 
 

@@ -4,8 +4,8 @@ startup-boilerplate
 node.js, backbone, socket.IO, mongoDB, with Auth and other excitment backed in!
 
 Inspitation
-- https://github.com/cliftonc/express-mvc-bootstrap
-
+- https://github.com/cliftonc/express-mvc-bootstrap for MVC setup of node
+- http://backbonetutorials.com/ for RequireJS implimentation of backbone
 
 
 Ideas / features

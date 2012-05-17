@@ -5,12 +5,14 @@ define([
 	'backbone',
 	'vm',
 	'events',
+	'facebook',
 	'text!templates/layout.html'
-], function($, _, Backbone, Vm, Events, layoutTemplate){
+], function($, _, Backbone, Vm, Events, FB, layoutTemplate){
+	
 	var AppView = Backbone.View.extend({
 		el: '#locations',
 		initialize: function(){
-			_.bindAll(this, 'render')
+			_.bindAll(this, 'render');
 		},
 		render: function(){
 			$(this.el).html(layoutTemplate);
@@ -18,5 +20,7 @@ define([
 		},
 		events: {}
 	});
+	
 	return AppView;
+	
 });

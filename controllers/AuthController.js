@@ -30,12 +30,12 @@ passport.use(new FacebookStrategy({
 ));
 
 passport.serializeUser(function(user, done) {
-	console.log('passport.serializeUser id = ' + user);
+	//console.log('passport.serializeUser id = ' + user);
 	done(null, user.id);
 });
 
 passport.deserializeUser(function(id, done) {
-	console.log('passport.deserializeUser id = ' + id);
+	//console.log('passport.deserializeUser id = ' + id);
 	User.findOne(id, function (err, user) {
     	done(err, user);
 	});
