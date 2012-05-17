@@ -11,6 +11,7 @@ require.config({
 		order: '/j/libs/require/order',
 
 		// load config file - this could be dependent on environment 
+		// appConfig: ( window.bootstrapJson.env === 'development')? 'config/development' : 'config/production',
 		appConfig: 'config/development',
 		
 		// external
@@ -24,15 +25,14 @@ require.config({
 
 // init the app
 require([
-	'views/app',
 	'router',
 	'vm'
-], function(AppView, Router, Vm){
+], function(Router, Vm){
 
 	window.fbAsyncInit = function() {
 		FB.init({
 			appId      : '237429156359045', // App ID
-			channelUrl : '//de.onside.me/channel.html', // Channel File
+			channelUrl : '//dev.onside.me/facebook/channel.html', // Channel File
 			status     : true, // check login status
 			cookie     : true, // enable cookies to allow the server to access the session
 			xfbml      : true  // parse XFBML
@@ -40,8 +40,8 @@ require([
 	    // Additional initialization code here
 	};
 
-	var appView = Vm.create({}, 'AppView', AppView);
-	Router.initialize({appView: appView});
-	appView.render(); // render() calls Backbone.history when its ready to start
+	//var appView = Vm.create({}, 'AppView', AppView);
+	Router.initialize();
+	//appView.render(); // render() calls Backbone.history when its ready to start
 
 });

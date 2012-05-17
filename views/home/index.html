@@ -1,4 +1,10 @@
+
 <h1>Auth Home page</h1>
+
+<script type="text/javascript">
+	AppJson = <%- JSON.stringify(user) %>
+</script>
+
 
 <header>
 	<!-- header options -->
@@ -9,6 +15,7 @@
 	<!-- display + set users status -->
 	<h2>Set your status</h2>
 	<form action="/status" method="post">
+		<p>Your current status = <%- JSON.stringify(user.status) %></p>
 		<span>I fancy..</span>
 		<select id="statusScale">
 			<option>what do you fancy?</option>
@@ -29,6 +36,10 @@
 			<option value="<%= content.statusTime[i].value %>"><%= content.statusTime[i].name %></option>
 			<% } %>
 		</select>
+		
+		<!-- get geolocation, update hidden input so saved to DB -->
+		<input type="hidden" name="statusGeo" value="" />
+		
 		<button type="submit">save</button>
 	</form>
 </section>

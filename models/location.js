@@ -5,11 +5,11 @@ var mongoose = require('mongoose'),
 var Location = new Schema({
     name: String,
     url: String,
+    description: String,
     geo: {
     	Lat: String,
     	Long: String 
-    },
-	alive: Boolean
+    }
 });
 
 mongoose.model('Location', Location);

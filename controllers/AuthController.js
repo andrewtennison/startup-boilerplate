@@ -1,7 +1,6 @@
 
 /**
  *  Auth Controller
- *  Created by create-controller script @ Tue May 08 2012 17:09:15 GMT+0100 (BST)
  **/
 
 var mongoose = require('mongoose'),	
@@ -35,7 +34,7 @@ passport.serializeUser(function(user, done) {
 });
 
 passport.deserializeUser(function(id, done) {
-	//console.log('passport.deserializeUser id = ' + id);
+	console.log('passport.deserializeUser id = ' + id);
 	User.findOne(id, function (err, user) {
     	done(err, user);
 	});

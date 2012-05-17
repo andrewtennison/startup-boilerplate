@@ -48,7 +48,8 @@ function bootApplication(app) {
 
 	// before sessions to prevent passport.deserializeUser being called for static assets
 	app.use(express.static(app_root + '/public_app'));
-	app.use(express.session({ secret: 'changeSecret' }));
+//	app.use(express.session({ secret: 'changeSecret' }));
+	app.use(express.session({cookie: { path: '/', httpOnly: true, maxAge: null}, secret:'changeSecret'}));
 //	app.use(express.session({store: new MemcachedStore({ hosts: ['127.0.0.1:11211'] }), secret: 'changeSecret' }));
 	app.use(passport.initialize());
 	app.use(passport.session());

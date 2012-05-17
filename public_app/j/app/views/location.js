@@ -5,25 +5,31 @@ define([
 	'backbone',
 	'events',
 	'facebook',
-	'text!templates/layout.html'
+	'text!templates/location.html'
 ], function($, _, Backbone, Events, FB, layoutTemplate){
 	
-	var AppView = Backbone.View.extend({
+	var LocationView = Backbone.View.extend({
 		el: '#locations',
 		initialize: function(){
-			console.info('AppView.init');
+			console.info('LocationView.init');
 			console.log(this.options)
+			var AppState = this.options.appState;
 			
 			_.bindAll(this, 'render');
+			
+			this.collection = AppState.get('locations');
+			this.collection.on('add', addOne)
+			this.collection.on('reset', addAll)
+			
 		},
 		render: function(){
-			console.info('AppView.render')
+			console.info('LocationView.render')
 			//$(this.el).html(layoutTemplate);
 			//Backbone.history.start();
 		},
 		events: {}
 	});
 	
-	return AppView;
+	return LocationView;
 	
 });

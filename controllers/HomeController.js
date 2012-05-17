@@ -49,7 +49,7 @@ module.exports = {
 				{value:'24', name:'late'}
 			]
 		};
-		res.render(ViewTemplatePath, {layout: 'layout.app.html', content:data});
+		res.render(ViewTemplatePath, {layout: 'layout.app.html', content:data, user:req.user});
 	}
 	
 };

@@ -1,0 +1,8 @@
+<h1>Location.show</h1>
+
+<p>Render HTML to have current location shown (for seo purposes)</p>
+<p>
+Backbone calls /location/:id route, this then needs to set the display to be the same as if navigated to, and try and load additional data in background.
+Backbone will need to check when hitting route if bootstrap JSON = path="/location" or content on page, then it will know it was native, rather than navigated to so wont try an fetch the data again.
+Possibly use bootstrap to populate model
+</p>

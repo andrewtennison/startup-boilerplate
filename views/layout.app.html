@@ -69,7 +69,21 @@
 		<a href="/friend">Friend</a>
 	</nav>
 	
+	<% if( !user ) { %>
+		<%- partial('partials/app.unauthHead.html') %>
+	<% } else { %>
+		<%- partial('partials/app.authHead.html') %>
+	<% } %>
+	
+	<section id="detail">
 	<%- body %>
+	</section>
+
+	<% if( !user ) { %>
+		<%- partial('partials/app.unauthFoot.html') %>
+	<% } else { %>
+		<%- partial('partials/app.authFoot.html') %>
+	<% } %>
 	
 </body>
 </html>

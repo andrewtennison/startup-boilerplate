@@ -1,4 +1,9 @@
 // Use this as a quick template for future modules
+
+/*
+ * I think the purpose of this is to manage creation of new views, and clean up any old views when a new view is created 
+ */
+
 define([
 	'jquery',
 	'underscore',
