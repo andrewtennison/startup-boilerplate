@@ -13,7 +13,7 @@ var mongoose = require('mongoose'),
 passport.use(new FacebookStrategy({
 		clientID: '237429156359045',
 		clientSecret: '47162acfe0016699b9b5c4eb6cada390',
-		callbackURL: "http://dev.onside.me:3000/auth/facebook/callback"
+		callbackURL: 'http://dev.onside.me:3000/auth/facebook/callback'
 	},
 	function(accessToken, refreshToken, profile, done) {
 		process.nextTick(function () {
@@ -30,16 +30,15 @@ passport.use(new FacebookStrategy({
 ));
 
 passport.serializeUser(function(user, done) {
-	done(null, user);
+	console.log('passport.serializeUser id = ' + user);
+	done(null, user.id);
 });
 
-passport.deserializeUser(function(obj, done) {
-	console.log(obj)
-	done(null, obj);
-	// User.findOne(id, function (err, user) {
-    	// done(err, user);
-	// });
-	
+passport.deserializeUser(function(id, done) {
+	console.log('passport.deserializeUser id = ' + id);
+	User.findOne(id, function (err, user) {
+    	done(err, user);
+	});
 });
 
 module.exports = {

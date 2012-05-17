@@ -27,6 +27,7 @@
 		"passport-facebook" : "",
 		"bcrypt" : "",
 		"stylus" : "",
-		"nib" : ""
+		"nib" : "",
+		"async" : ""
 	}
 }

@@ -11,8 +11,16 @@ var app,
 	nib			= require('nib'),
 	passport	= require('passport'),
 	LocalStrategy = require('passport-local').Strategy;
+	
+/*
+SessionMongoose = require("session-mongoose");
+var mongooseSessionStore = new SessionMongoose({
+	url: "mongodb://localhost/session",
+	interval: 120000 // expiration check worker run interval in millisec (default: 60000)
+});
+*/
 
-	mongoose.connect('mongodb://localhost/boilerplate');
+mongoose.connect('mongodb://localhost/boilerplate');
 
 
 // Initial bootstrapping
@@ -37,19 +45,22 @@ function bootApplication(app) {
 	app.use(express.bodyParser());
 	app.use(express.methodOverride());
 	app.use(express.cookieParser());
+
+	// before sessions to prevent passport.deserializeUser being called for static assets
+	app.use(express.static(app_root + '/public_app'));
 	app.use(express.session({ secret: 'changeSecret' }));
 //	app.use(express.session({store: new MemcachedStore({ hosts: ['127.0.0.1:11211'] }), secret: 'changeSecret' }));
 	app.use(passport.initialize());
 	app.use(passport.session());
 
 	app.use(stylus.middleware({
-		src: __dirname + '/public',
+		src: __dirname + '/public_app',
 		compile: function (str, path) {
-			return stylus(str).set('filename', path).set('compress', true).use(nib());
+			return stylus(str).set('filename', path).set('compress', true).use(nib()).import('nib');;
 		}
 	}));
 
-	app.use(express.static(app_root + '/public'));
+	// dynamic router
 	app.use(app.router);
 
 	app.use(express.logger());

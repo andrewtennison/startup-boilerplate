@@ -1,8 +1,7 @@
 var mongoose = require('mongoose'),
 	Schema = mongoose.Schema,
 	ObjectId = Schema.ObjectId,
-	mongooseTypes = require("mongoose-types"),
-	request = require('request');
+	mongooseTypes = require("mongoose-types");
 
 
 mongooseTypes.loadTypes(mongoose);
@@ -44,13 +43,6 @@ User.static('findByFacebook', function (accessToken, profile, callback) {
 
 	var U = this;
 
-	// var url = 'https://graph.facebook.com/' + profile._json.username + '/friends?access_token=' + accessToken;
-	// request({url:url, json:true}, function (error, response, friendsJSON) {
-		// if (!error && response.statusCode == 200) {
-			// console.log(friendsJSON)
-		// }
-	// });
-	
 	U.findOne({ fb_uid: profile.id }, function(err, user) {
 		if (err){
 			console.log('user error')
@@ -71,6 +63,7 @@ User.static('findByFacebook', function (accessToken, profile, callback) {
 			};
 			user.gender = profile.gender;
 			//user.date.lastVisited = Date.now;
+			console.log('findByFacebook 3');
 
 			if (newUser){
 				user.save(function(err) {

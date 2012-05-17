@@ -36,41 +36,24 @@ function ensureAuthenticated(req, res, next) {
 	res.redirect('/', {message:'not logged in', status:401})
 }
 
+function andRestrictToSelf(req, res, next) {
+	req.authenticatedUser.id == req.user.id
+	? next()
+	: next(new Error('Unauthorized'));
+}
+function andRestrictTo(role) {
+	return function(req, res, next) {
+		req.authenticatedUser.role == role
+		? next()
+		: next(new Error('Unauthorized'));
+	}
+}
+
+
 function authCallback(req, res){
 	authRouter(req, res, false)
 }
-/*
-function authCallback(req, res){
-	var controller = 'auth';
-	var action = req.params.action ? req.params.action : '';
-	var callback = req.params.callback ? req.params.callback : '';
-	var fn = 'index';
 
-	// Default route
-	if(controller.length == 0) return;
-	
-	fn = (callback)? 'callback' : 'index';
-	fn += action.capitalize() + 'Callback';
-
-	console.log('callback controller = ' + './' + controller.capitalize() + 'Controller >> ' + fn)
-
-	try {
-		var path = './' + controller.capitalize() + 'Controller',
-			controllerLibrary = require(path);
-			
-		if(typeof controllerLibrary[fn] === 'function') {
-			console.log('call '+path+' function')
-			controllerLibrary[fn](req,res);		
-		} else {
-			console.log(path+' not function')
-			return;
-		}
-	} catch (e) {
-		return;
-	}
-	
-}
-*/
 function authRouter(req, res, next){
 	var controller = 'auth';
 	var action = req.params.action ? req.params.action : '';
@@ -161,16 +144,25 @@ function router(req, res, next) {
 	
 	try {
 		var controllerLibrary = require('./' + controller.capitalize() + 'Controller');
+		
+		// if(typeof controllerLibrary[fn] === 'object'){
+			// var options = controllerLibrary[fn].middlewhere;
+			// // run middlewhere dependent on options. 
+			// // finally run controllerLibrary[fn].init
+		// }
+		
 		if(typeof controllerLibrary[fn] === 'function') {
 			console.log('call '+controllerLibrary+' function')
 			controllerLibrary[fn](req,res,next);		
 		} else {
 			console.log(controllerLibrary+' not function')
-			res.render('404');
+			//res.render('404');
+			res.send(404)
 		}
 	} catch (e) {
 		console.log(e)
-		res.render('404');
+		res.send(404)
+		//res.render('404');
 	}
 };
 
@@ -202,7 +194,11 @@ function index(req, res, next) {
 			}
 		});
 
-		res.render('app',{controllers:controllers, user: req.user});
+		var data = {
+			controllers:controllers, 
+			user: req.user
+		};
+		res.render('app', {content:data});
 	
 	});	
 };

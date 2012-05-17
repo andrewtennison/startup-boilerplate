@@ -1,8 +1,8 @@
 <h1>app.index</h1>
 
-<% if(user) { %>
+<% if(content.user) { %>
 <p>You are logged in</p>
-<p><%- JSON.stringify(user) %></p>
+<p><%- JSON.stringify(content.user) %></p>
 <% } else { %>
 <a href="/auth/facebook/">login with facebook</a>
 <% } %>

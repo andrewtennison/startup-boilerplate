@@ -1,19 +1,51 @@
+
 <h1>Auth Home page</h1>
 
 <header>
 	<!-- header options -->
+	
 </header>
 
-<section id="status">
+<section id="status" class="box">
 	<!-- display + set users status -->
+	<h2>Set your status</h2>
+	<form action="/status" method="post">
+		<span>I fancy..</span>
+		<select id="statusScale">
+			<option>what do you fancy?</option>
+			<% for(var i = 0; i < content.statusScale.length; i++){ %>
+			<option value="<%= content.statusScale[i].value %>"><%= content.statusScale[i].name %></option>
+			<% } %>
+		</select>
+		<select id="statusDistance">
+			<option>where?</option>
+			<% for(var i = 0; i < content.statusDistance.length; i++){ %>
+			<option value="<%= content.statusDistance[i].value %>"><%= content.statusDistance[i].name %></option>
+			<% } %>
+		</select>
+		<span>I am free</span>
+		<select id="statusTime">
+			<option>when?</option>
+			<% for(var i = 0; i < content.statusTime.length; i++){ %>
+			<option value="<%= content.statusTime[i].value %>"><%= content.statusTime[i].name %></option>
+			<% } %>
+		</select>
+		<button type="submit">save</button>
+	</form>
 </section>
 
-<section id="friends">
+<section id="friends" class="box">
 	<!-- display friends who have set current status as available, toggle those not + undecided -->
+	<h2>Your friends</h2>
+	<ul>
+	</ul>
 </section>
 
-<section id="locations">
+<section id="locations" class="box">
 	<!-- display suggested locations -->
+	<h2>Find a location</h2>
+	<ul>
+	</ul>
 </section>
 
 <nav>
