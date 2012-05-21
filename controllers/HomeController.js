@@ -8,7 +8,6 @@ var mongoose = require('mongoose'),
 	User = mongoose.model('User'),
 	ViewTemplatePath = 'home';
 
-
 module.exports = {
 
 	index : function(req,res,next){

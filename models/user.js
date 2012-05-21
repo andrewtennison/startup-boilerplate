@@ -3,12 +3,11 @@ var mongoose = require('mongoose'),
 	ObjectId = Schema.ObjectId,
 	mongooseTypes = require("mongoose-types");
 
-
 mongooseTypes.loadTypes(mongoose);
+
+
 var Email = mongoose.SchemaTypes.Email;
-
 var Friends = new Schema({name : String})
-
 var User = new Schema({
 	// eMail address
 	email: { type: Email, unique: true },
@@ -87,3 +86,19 @@ User.static('findByFacebook', function (accessToken, profile, callback) {
 });
 
 module.exports = mongoose.model('User', User);
+
+var UserModel = mongoose.model('User'),
+	passport = require('passport');
+
+passport.serializeUser(function(user, done) {
+	console.log('passport.serializeUser id = ' + user);
+	done(null, user.id);
+});
+
+passport.deserializeUser(function(id, done) {
+	console.log('passport.deserializeUser id = ' + id);
+	UserModel.findOne(id, function (err, user) {
+    	done(err, user);
+	});
+});
+

@@ -1,6 +1,5 @@
 var fs = require('fs'),
 	inflection = require('../lib/inflection');
-	
 
 module.exports = function(app) {
 	
@@ -49,11 +48,10 @@ function andRestrictTo(role) {
 	}
 }
 
-
+// Routing for 3rd party authentication
 function authCallback(req, res){
 	authRouter(req, res, false)
 }
-
 function authRouter(req, res, next){
 	var controller = 'auth';
 	var action = req.params.action ? req.params.action : '';
@@ -92,6 +90,7 @@ function authRouter(req, res, next){
 	}
 };
 
+// Primary router
 function router(req, res, next) {
 	var controller = req.params.controller ? req.params.controller : '';
 	var action = req.params.action ? req.params.action : '';

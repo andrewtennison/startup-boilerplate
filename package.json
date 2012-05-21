@@ -18,6 +18,7 @@
 		"socket.io" : ">=0.6.16",
 		"mongoose" : ">=2.5",
 		"mongoose-types" : "",
+		"session-mongoose" : "",
 		"expresso" : ">=0.9",
 		"should" : ">=0.0.4",					
 		"aws-lib" : ">= 0.0.5",

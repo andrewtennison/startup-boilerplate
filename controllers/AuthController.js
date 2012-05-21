@@ -29,7 +29,7 @@ passport.use(new FacebookStrategy({
 ));
 
 passport.serializeUser(function(user, done) {
-	//console.log('passport.serializeUser id = ' + user);
+	console.log('passport.serializeUser id = ' + user);
 	done(null, user.id);
 });
 
