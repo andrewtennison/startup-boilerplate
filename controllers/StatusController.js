@@ -15,38 +15,19 @@ module.exports = {
 	 * For JSON use '/users.json'
 	 **/
 	index: function(req, res, next) {
-		console.log('UserController.index')
-		User.find({}, function (err, docs) {
-			var content = {
-				users:docs
-			}
-			res.render(ViewTemplatePath, {users : docs});
-		});
+		res.send({error:'service not enabled'})
 	},
 	
 	/**
 	 * Show action, returns shows a single item via views/users/show.html view or via json
 	 * Default mapping to GET '/user/:id'
-	 * For JSON use '/user/:id.json'
+	 * For JSON use '/status/:id.json'
 	 **/	
-	show: function(req, res, next) {	  		  
-			
-		  User.findById(req.params.id, function(err, user) {
-			  
-			  if(err) return next(err);
-			  
-		      switch (req.params.format) {
-		        case 'json':
-		          res.send(user.toObject());
-		          break;
-	
-		        default:
-		        	var data = { user:user };
-		        	res.render(ViewTemplatePath + "/show",{content:data, user:user});
-		      }
-		      
-		  });
-		      
+	show: function(req, res, next) {
+		User.findById(req.params.id, ['status'], function(err, user) {
+			if(err) return next(err);
+			res.send(user.toObject());
+		});
 	},
 	
 	/**
@@ -54,10 +35,7 @@ module.exports = {
 	 * Default mapping to GET '/user/:id/edit'
 	 **/  	  
 	edit: function(req, res, next){
-		  User.findById(req.params.id, function(err, user) {
-			  if(err) return next(err);
-			  res.render(ViewTemplatePath + "/edit",{user:user});
-		});
+		res.send({error:'service not enabled'})
 	},
 	  
 	/**
@@ -69,28 +47,23 @@ module.exports = {
 	    User.findById(req.params.id, function(err, user) {
 	    	if (!user) return next(err);
 			console.log(req.body)
-			console.log(req.params)
 
-			user = req.body;
+			var newStatus = {
+				scale	: req.body.scale,
+				distance: req.body.distance,
+				time	: req.body.time,
+				geo		: [req.body.lat, req.body.lng]
+			};
+			user.status.push(newStatus);
 
 	        user.save(function(err) {
-	    	  if (err) {
-	    		  console.log(err);
-	        	  req.flash('error','Could not update user: ' + err);
-	          	  res.redirect('/users');
-	          	  return;
-	    	  }
-	    		
-	          switch (req.params.format) {
-	            case 'json':
-	              res.send(user.toObject());
-	              break;
-	            default:
-	              req.flash('info', 'User updated');
-	              res.redirect('/user/' + req.params.id);
-	          }
-	        });
-	      });
+				if (err) {
+			   		res.send({error:err});
+					return;
+				}
+				res.send(user.status.toObject());
+			});
+		});
 	},
 	  
 	/**

@@ -31,14 +31,9 @@ Next Steps
 v1 - we suggest venues based on users in your friends lists geo locations
 v2 - manage a list of suggested / highlighted / voted locations accross a group of users
 
-0. Sessions
-- add mongoDB session to persist accross server restarts
 
 1. Locations
-- view /locations > list (add filter params later)
-- view /location/id > get single location
-- create /location POST
-- update /location
+- location geo lat/long from postcode?
 
 2. Status
 - post status, array of status. If current still active, update. If prior is expired add new and delete old

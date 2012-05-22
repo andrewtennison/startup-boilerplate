@@ -5,40 +5,42 @@
 	AppJson = <%- JSON.stringify(user) %>
 </script>
 
-
 <header>
 	<!-- header options -->
-	
 </header>
 
 <section id="status" class="box">
 	<!-- display + set users status -->
 	<h2>Set your status</h2>
-	<form action="/status" method="post">
-		<p>Your current status = <%- JSON.stringify(user.status) %></p>
+
+	<p>Your current status = <%- JSON.stringify(user.status) %></p>
+
+	<form action="/status/<%= user.id %>" method="post">
+		<input type="hidden" name="_method" value="put" />
 		<span>I fancy..</span>
-		<select id="statusScale">
-			<option>what do you fancy?</option>
+		<select id="statusScale" name="scale">
+			<option value="">what do you fancy?</option>
 			<% for(var i = 0; i < content.statusScale.length; i++){ %>
 			<option value="<%= content.statusScale[i].value %>"><%= content.statusScale[i].name %></option>
 			<% } %>
 		</select>
-		<select id="statusDistance">
-			<option>where?</option>
+		<select id="statusDistance" name="distance">
+			<option value="">where?</option>
 			<% for(var i = 0; i < content.statusDistance.length; i++){ %>
 			<option value="<%= content.statusDistance[i].value %>"><%= content.statusDistance[i].name %></option>
 			<% } %>
 		</select>
 		<span>I am free</span>
-		<select id="statusTime">
-			<option>when?</option>
+		<select id="statusTime" name="time">
+			<option value="">when?</option>
 			<% for(var i = 0; i < content.statusTime.length; i++){ %>
 			<option value="<%= content.statusTime[i].value %>"><%= content.statusTime[i].name %></option>
 			<% } %>
 		</select>
 		
 		<!-- get geolocation, update hidden input so saved to DB -->
-		<input type="hidden" name="statusGeo" value="" />
+		<input type="hidden" name="lat" value="" />
+		<input type="hidden" name="lng" value="" />
 		
 		<button type="submit">save</button>
 	</form>
@@ -58,6 +60,21 @@
 	<ul>
 	</ul>
 </section>
+
+<script type="text/javascript" src="/j/libs/jquery/jquery-min.js"></script>
+<script type="text/javascript">
+	function success(pos){
+		console.log(pos)
+		$('input[name="lat"]').val(pos.coords.latitude);
+		$('input[name="lng"]').val(pos.coords.longitude);
+	}
+	function error(msg){
+		console.error(msg)
+	}
+	if (navigator.geolocation) {
+	  navigator.geolocation.getCurrentPosition(success, error);
+	}
+</script>
 
 <nav>
 	<!-- nav options -->

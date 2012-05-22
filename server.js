@@ -61,13 +61,12 @@ function bootApplication(app) {
 	app.use(stylus.middleware({
 		src: __dirname + '/public_app',
 		compile: function (str, path) {
-			return stylus(str).set('filename', path).set('compress', true).use(nib()).import('nib');;
+			return stylus(str).set('filename', path).set('compress', true).use(nib()).import('nib');
 		}
 	}));
 
 	// dynamic router
 	app.use(app.router);
-
 	app.use(express.logger());
 	app.use(logging.requestLogger);
 

@@ -7,7 +7,21 @@ mongooseTypes.loadTypes(mongoose);
 
 
 var Email = mongoose.SchemaTypes.Email;
-var Friends = new Schema({name : String})
+
+var Friends = new Schema({name : String});
+
+var Status = new Schema({
+	scale : String,
+	distance : String,
+	time : String,
+    geo: {
+    	index:'2d',
+    	//required: true,
+    	type:[Number]
+    },
+    created: { type: Date, default: Date.now }
+});
+
 var User = new Schema({
 	// eMail address
 	email: { type: Email, unique: true },
@@ -34,7 +48,7 @@ var User = new Schema({
 	visits: {type: Number, default: 0},
 	isNew: {type: Boolean, default: true},
 	
-	status:[] // array of obj { scale:'', distance:'', time:'', end:'calc endTime as time + scale' }
+	status:[Status] // array of obj { scale:'', distance:'', time:'', end:'calc endTime as time + scale' }
 });
 
 
@@ -85,8 +99,19 @@ User.static('findByFacebook', function (accessToken, profile, callback) {
 	});
 });
 
+// pre fetch, if user not self, return limited info
+User.pre('save', function(next){
+	next();
+});
+
+// check if status already exists, possibly remove old
+User.pre('save', function(next){
+	next();
+});
+
 module.exports = mongoose.model('User', User);
 
+// Passport serialize / deserialize user session
 var UserModel = mongoose.model('User'),
 	passport = require('passport');
 
