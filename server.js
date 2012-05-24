@@ -15,7 +15,7 @@ var app,
 
 var mongooseSessionStore = new SessionMongoose({
 	url: "mongodb://localhost/session",
-	interval: 120000 // expiration check worker run interval in millisec (default: 60000)
+	interval: 6000 // expiration check worker run interval in millisec (default: 60000)
 });
 
 mongoose.connect('mongodb://localhost/boilerplate');
@@ -51,7 +51,7 @@ function bootApplication(app) {
 //	app.use(express.session({store: new MemcachedStore({ hosts: ['127.0.0.1:11211'] }), secret: 'changeSecret' }));
 	app.use(express.session({
 		secret: "changeSecret",
-		//maxAge: new Date(Date.now() + 3600000), 
+		maxAge: new Date(Date.now() + 3600000), 
 		store: mongooseSessionStore 
     }));
 
@@ -90,6 +90,7 @@ function bootApplication(app) {
 	// Some dynamic view helpers
 	app.dynamicHelpers({
 		request: function(req){ return req; },
+		//user: function(req){ return req.user; },
 		hasMessages: function(req){ return Object.keys(req.session.flash || {}).length; },
 		messages: function(req){
 			return function(){

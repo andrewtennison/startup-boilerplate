@@ -33,11 +33,10 @@ v2 - manage a list of suggested / highlighted / voted locations accross a group 
 
 
 1. Locations
-- location geo lat/long from postcode?
+- query based on user geo to find close locations
 
 2. Status
-- post status, array of status. If current still active, update. If prior is expired add new and delete old
-- get geolocation and add to post info
+- pretty status, based on start + duration, hide / tag expired. 
 - /status - get all friends statuses (+refresh button prior to websocket, or add polling)
 - /status/id - get single friend status > check if friend for permission
 

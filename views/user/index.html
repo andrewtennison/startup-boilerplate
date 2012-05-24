@@ -1,7 +1,15 @@
 <h1>user ?? </h1>
 
-<% if(users) { %>
-	<p><%- JSON.stringify(users) %></p>
-<% } else { %>
-	<p>no users</p>
-<% } %>
+<% if(!user) var user = {}; %>
+Session ID = <%= user.id %>
+<hr />
+
+<% content.users.forEach(function(u){ %>
+	<% if(u.id === user.id) { %>
+		<strong>Me >> </strong>
+	<% } %>
+	<%= u.displayName %> / <%= u.id %>
+	<a href="/user/<%= u.id %>">View</a>
+	<a href="/user/<%= u.id %>/edit">edit</a>
+	<hr />
+<% }); %>

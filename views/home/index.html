@@ -13,6 +13,8 @@
 	<!-- display + set users status -->
 	<h2>Set your status</h2>
 
+	<p>You = <%- JSON.stringify(user) %></p>
+
 	<p>Your current status = <%- JSON.stringify(user.status) %></p>
 
 	<form action="/status/<%= user.id %>" method="post">

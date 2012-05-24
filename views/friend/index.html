@@ -1,10 +1,20 @@
 <h1>Friends already on Fancy A...</h1>
 
+<%- JSON.stringify(content.friends) %>
+
+<ul>
+<% for(var i=0; i < content.friends.length; i++) {%>
+	<li>
+   		<%= content.friends[i].displayName %> <a href="/friend/<%= content.friends[i].id %>">view</a>
+	</li>
+<% } %>
+</ul>
+
 
 <ul>
 <% for(var i=0; i < content.fb_friends.length; i++) {%>
 	<li>
-   		<%= content.fb_friends[i].displayName %> <a href="/user/<%= content.fb_friends[i].id %>/add">Add</a>
+   		<%= content.fb_friends[i] %>
 	</li>
 <% } %>
 </ul>

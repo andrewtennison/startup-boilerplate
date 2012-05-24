@@ -148,29 +148,10 @@ function router(req, res, next) {
 
 function index(req, res, next) {
 
-	/**
-	 * If you want to redirect to another controller, uncomment
-	 */
-	// res.redirect('/controllerName');
-	
-	var controllers = [];
-	
 	console.log('AppController.index')
-	fs.readdir(__dirname + '/', function(err, files){
-
-		if (err) throw err;
-
-		files.forEach(function(file){
-			if(file != "AppController.js") {
-				controllers.push(file.replace('Controller.js','').toLowerCase());
-			}
-		});
-
-		var data = {
-			controllers:controllers, 
-			user: req.user
-		};
-		res.render('app', {content:data});
 	
-	});	
+	var content = {};
+	
+	res.render('app', {content:content});
+	
 };

@@ -15,6 +15,7 @@ module.exports = {
 	 * For JSON use '/users.json'
 	 **/
 	index: function(req, res, next) {
+		console.log('controller.status.index')
 		res.send({error:'service not enabled'})
 	},
 	
@@ -24,6 +25,7 @@ module.exports = {
 	 * For JSON use '/status/:id.json'
 	 **/	
 	show: function(req, res, next) {
+		console.log('controller.status.show')
 		User.findById(req.params.id, ['status'], function(err, user) {
 			if(err) return next(err);
 			res.send(user.toObject());
@@ -35,6 +37,7 @@ module.exports = {
 	 * Default mapping to GET '/user/:id/edit'
 	 **/  	  
 	edit: function(req, res, next){
+		console.log('controller.status.edit')
 		res.send({error:'service not enabled'})
 	},
 	  
@@ -43,7 +46,7 @@ module.exports = {
 	 * Default mapping to PUT '/user/:id', no GET mapping	 
 	 **/  
 	update: function(req, res, next){
-
+		console.log('controller.status.update')
 	    User.findById(req.params.id, function(err, user) {
 	    	if (!user) return next(err);
 			console.log(req.body)
@@ -71,27 +74,28 @@ module.exports = {
 	 * Default mapping to POST '/users', no GET mapping	 
 	 **/  
 	create: function(req, res, next){
+		console.log('controller.status.create')
 		
-		  var user = new User(req.body.user);
-		  
-		  user.save(function(err) {
-		   
-			if (err) {
-	    	  req.flash('error','Could not create user: ' + err);
-	      	  res.redirect('/users');
-	      	  return;
-			}
-	
-		    switch (req.params.format) {
-		      case 'json':
-		        res.send(user.toObject());
-		        break;
-	
-		      default:
-		    	  req.flash('info','User created');
-		      	  res.redirect('/user/' + user.id);
-			 }
-		  });	  
+	    User.findById(req.params.id, function(err, user) {
+	    	if (!user) return next(err);
+			console.log(req.body)
+
+			var newStatus = {
+				scale	: req.body.scale,
+				distance: req.body.distance,
+				time	: req.body.time,
+				geo		: [req.body.lat, req.body.lng]
+			};
+			user.status.push(newStatus);
+
+	        user.save(function(err) {
+				if (err) {
+			   		res.send({error:err});
+					return;
+				}
+				res.send(user.status.toObject());
+			});
+		});
 		  
 	},
 	  
@@ -100,26 +104,8 @@ module.exports = {
 	 * Default mapping to DEL '/user/:id', no GET mapping	 
 	 **/ 
 	destroy: function(req, res, next){
-		  
-		  User.findById(req.params.id, function(err, user) {
-		        
-		    	if (!user) { 
-	  	    	  	req.flash('error','Unable to locate the user to delete!');
-		    		res.render('404'); 
-		    		return false; 
-		    	};
-		    		    
-		    	user.remove(function(err) {
-	    		  if(err) {
-	    	    	  req.flash('error','There was an error deleting the user!');
-	    			  res.send('false');
-	    		  } else {
-	    	    	  req.flash('info','User deleted');
-	    			  res.send('true');
-	    		  }    	          
-	   	      	}); 
-		  });
-		  
+		console.log('controller.status.destory')
+		res.send({error:'service not enabled'})
 	}
 	
 };

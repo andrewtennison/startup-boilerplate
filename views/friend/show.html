@@ -1,4 +1,4 @@
-<h1>User.show</h1>
+<h1>friend.show</h1>
 
 <script type="text/javascript" src="/j/libs/jquery/jquery-min.js"></script>
 <script type="text/javascript">
@@ -11,9 +11,9 @@
 			var ID = this.id;
 			$.ajax({
 				type: "DELETE",
-				url: "/user/" + ID,				   
+				url: "/friend/" + ID,				   
 				success: function(msg) {				   	  
-					window.location.replace("/user");
+					window.location.replace("/friend");
 				},
 				error: function(msg) {					  
 					alert("I was unable to delete the test - something has gone wrong, apologies!");
@@ -24,12 +24,16 @@
 	});
 </script>
 
-<p>friends: <%- JSON.stringify(content.user.friends) %></p>
-<hr />
-<p>status: <%- JSON.stringify(content.user.status) %></p>
-<hr />
-<p><%- JSON.stringify(content.user) %></p>
+<p>Friend: <%- JSON.stringify(content.friend) %></p>
+<p>User: <%- JSON.stringify(content.user.friends) %></p>
 
-<a href="/user/<%= content.user.id %>/edit">Edit user</a>
-<button class="button-delete" id="<%= content.user.id %>"  title="Delete test ...">Delete</button>
+<a href="/friend/<%= content.friend.id %>/invite">Invite friend</a>
+
+<a href="/friend/<%= content.friend.id %>/edit">Edit friend</a>
+<button class="button-delete" id="<%= content.friend.id %>"  title="Delete test ...">Delete</button>
+
+
+
+
+
 
