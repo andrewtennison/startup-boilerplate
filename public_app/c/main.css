@@ -1,0 +1,43 @@
+/*
+ * Main.css 
+ * Base file that imports all required files
+ *  
+ * */
+
+
+@import 'normalize.css';
+
+* {position:relative}
+section, article, div {display:block; -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box; }
+
+html,
+body,
+#masthead,
+.page,
+#navPrimary
+	{position:absolute; top:0; right:0; bottom:0; left:0}
+
+body {margin:0; padding:0; background:#fff}
+
+#masthead {background:#888; height:40px; bottom:auto; box-shadow:inset 0 -3px 3px -3px #000}
+	#masthead h1 {display:inline-block; margin:0; padding:10px}
+	#masthead a {}
+
+.page {top:40px; bottom:50px}
+#navPrimary {top:auto; height:50px; background:#888; color:#fff; box-shadow:inset 0 3px 3px -3px #000}
+
+.box {box-shadow:inset 0 -1px 0 0 #eee, inset 0 -2px 0 0 #999}
+
+	.box header {border-bottom:1px dashed #999; padding:5px; font-size:12px}
+		.box header h1 {display:inline-block; margin:0; padding:0; color:#888}
+		.box header p {display:inline-block; margin:0; padding:0; color:#888}
+		.box header .button {position:absolute; top:5px; right:5px;}
+	.box .summary {}
+	.box ol {}
+	
+
+#status {}
+#status h1 {font-size:15px; display:inline-block; padding:10px 0 10px 70px}
+#status img {position:absolute; left:10px; top:10px; box-shadow:0 0 2px #000}
+#status p {display:inline-block}
+#status form {padding:10px; background:#888; box-shadow:inset 0 3px 3px -3px #000, inset 0 -2px 3px -3px #000}

@@ -1,0 +1,28 @@
+<form action="/status" method="post">
+	<span>I fancy..</span>
+	<select id="statusScale" name="scale">
+		<!--option value="">what do you fancy?</option-->
+		<% for(var i = 0; i < content.statusScale.length; i++){ %>
+		<option value="<%= content.statusScale[i].value %>"><%= content.statusScale[i].name %></option>
+		<% } %>
+	</select>
+	<select id="statusDistance" name="distance">
+		<!--option value="">where?</option-->
+		<% for(var i = 0; i < content.statusDistance.length; i++){ %>
+		<option value="<%= content.statusDistance[i].value %>"><%= content.statusDistance[i].name %></option>
+		<% } %>
+	</select>
+	<span>I am free</span>
+	<select id="statusTime" name="time">
+		<!--option value="">when?</option-->
+		<% for(var i = 0; i < content.statusTime.length; i++){ %>
+		<option value="<%= content.statusTime[i].value %>"><%= content.statusTime[i].name %></option>
+		<% } %>
+	</select>
+	
+	<!-- get geolocation, update hidden input so saved to DB -->
+	<input type="hidden" name="lat" value="" />
+	<input type="hidden" name="lng" value="" />
+	
+	<button type="submit">save</button>
+</form>

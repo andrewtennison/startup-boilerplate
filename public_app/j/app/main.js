@@ -13,7 +13,7 @@ require.config({
 		// load config file - this could be dependent on environment 
 		// appConfig: ( window.bootstrapJson.env === 'development')? 'config/development' : 'config/production',
 		appConfig: 'config/development',
-		
+				
 		// external
 		facebook: 'http://connect.facebook.net/en_US/all',
 

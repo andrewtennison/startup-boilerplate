@@ -5,13 +5,14 @@ define([
 	'backbone',
 	'vm',
 	'appConfig',
-	'model/appState',
-	'views/app'
+	'models/appState',
+	'views/app',
 ], function ($, _, Backbone, Vm, Config, AppStateModel, AppView) {
 	var appState; // scope global to file, set in init
 	
 	var AppRouter = Backbone.Router.extend({
 		routes: {
+			'/friend/' : 'getFriends',
 			'/location/:id' : 'getLocation',
 			'*actions': 'defaultAction' // All urls will trigger this route
 		},
@@ -19,7 +20,7 @@ define([
 			// in init() define all views required on ALL page loads. Unique views can be defined in routes
 			
 			// This is JSON embeded in the page so can be used straight away prevent extra ajax requests
-			var bootStrapJson = window[Config.bootStrapJSON];
+			var bootStrapJson = window[Config.bootStrapJSON] || {};
 			
 			// AppState is a model that maintains state across all views
 			appState = new AppStateModel();
@@ -29,12 +30,21 @@ define([
 
 			// Load User
 			( bootStrapJson.user )
-				? appState.get('user').reset( Config.bootStrapJSON.user )
+				? appState.get('user').set( bootStrapJson.user )
 				: appState.get('user').fetch();
 			
 			// Views
 			var appView = Vm.create({}, 'AppView', AppView, {appState:appState});
 		},
+		
+		getFriends: function(){
+			require(['views/friend/index'], function (FriendPageView) {
+				var friendPage = Vm.create(appView, 'FriendPageView', FriendPageView);
+				// FriendPageView.show();
+				// may be better to trigger and let the view render? Or setApp state, let AppView manage display
+			});
+		},
+		
 		getLocation: function(id){
 			// see if ID exists in collection
 			var model = appState.get('locations').get(id);

@@ -5,7 +5,35 @@
  **/
 var mongoose = require('mongoose'),	
 	User = mongoose.model('User'),
-	ViewTemplatePath = 'user';
+	ViewTemplatePath = 'user',
+	statusValues = require('../lib/statusValues');
+
+function findInArray(arr, prop, value){
+	var l = arr.length;
+	while(l--){
+		if(arr[l][prop] === value) return arr[l];
+	}
+	return false;
+}
+
+function createExpires(status){
+	var date = new Date( status.created ),
+		duration = parseInt( status.scale ),
+		startTime = parseInt( status.time );
+
+	if( startTime === 1) startTime = date.getHours();
+	date.setHours( startTime + duration );
+	return date;
+}
+
+function createTitle(username, status){
+	var string = username + ' fancies';
+	string += ' ' + findInArray(statusValues.statusScale, 'value', status.scale).name;
+	string += ' ' + findInArray(statusValues.statusDistance, 'value', status.distance).name;
+	string += ' and is  ' + findInArray(statusValues.statusTime, 'value', status.time).name;
+	console.log('createTitle = ' + string)
+	return string;
+}
 
 module.exports = {
 
@@ -16,14 +44,17 @@ module.exports = {
 	 **/
 	index: function(req, res, next) {
 		console.log('controller.status.index')
-		res.send({error:'service not enabled'})
+		if( !req.user ) res.send({error:{msg: 'user must be loggeed in', status:401}});
+		var status = req.user.status.sort(function(a,b){ return b.created - a.created });
+		// could check if status has expired and return nothing
+		res.send(status[0]);
 	},
 	
 	/**
 	 * Show action, returns shows a single item via views/users/show.html view or via json
 	 * Default mapping to GET '/user/:id'
 	 * For JSON use '/status/:id.json'
-	 **/	
+	 **/
 	show: function(req, res, next) {
 		console.log('controller.status.show')
 		User.findById(req.params.id, ['status'], function(err, user) {
@@ -57,6 +88,7 @@ module.exports = {
 				time	: req.body.time,
 				geo		: [req.body.lat, req.body.lng]
 			};
+			
 			user.status.push(newStatus);
 
 	        user.save(function(err) {
@@ -76,27 +108,39 @@ module.exports = {
 	create: function(req, res, next){
 		console.log('controller.status.create')
 		
-	    User.findById(req.params.id, function(err, user) {
-	    	if (!user) return next(err);
-			console.log(req.body)
+		var user = req.user;
+    	if (!user) return next(err);
+		console.log(req.body);
+		
+		var errors = [];
+		if( req.body.scale === '') errors.push('Please choose a scale');
+		if( req.body.distance === '') errors.push('Please choose a distance');
+		if( req.body.time === '') errors.push('Please choose a time');
+		
+		if( errors.length > 0 ){
+			req.flash('error','missing values');
+			res.redirect('back');
+			return;
+		}
 
-			var newStatus = {
-				scale	: req.body.scale,
-				distance: req.body.distance,
-				time	: req.body.time,
-				geo		: [req.body.lat, req.body.lng]
-			};
-			user.status.push(newStatus);
+		var newStatus = {
+			scale	: req.body.scale,
+			distance: req.body.distance,
+			time	: req.body.time,
+			geo		: [req.body.lat, req.body.lng],
+			created : new Date()
+		};
+		
+		newStatus.expires = createExpires(newStatus);
+		newStatus.title = createTitle(req.user.displayName, newStatus);
 
-	        user.save(function(err) {
-				if (err) {
-			   		res.send({error:err});
-					return;
-				}
-				res.send(user.status.toObject());
-			});
+		// if current status has not expired, could update it?
+		user.status.push(newStatus);
+        user.save(function(err) {
+			(err)
+				? res.send({error:err})
+				: res.send(newStatus);
 		});
-		  
 	},
 	  
 	/**

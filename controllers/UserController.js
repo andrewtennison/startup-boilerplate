@@ -16,12 +16,17 @@ module.exports = {
 	 **/
 	index: function(req, res, next) {
 		console.log('UserController.index')
-		//if( !req.user ) res.redirect('/');
 		
-		User.find({}, function (err, docs) {
-			var data = { users:docs };
-			res.render(ViewTemplatePath, {content:data, user:req.user});
-		});
+		if(req.xhr){
+			if( !req.user ) res.send({error:{msg:'not logged in', status:401}});
+			res.send(req.user)
+		}else{
+			if( !req.user ) res.redirect('/');
+			User.find({}, function (err, docs) {
+				var data = { users:docs };
+				res.render(ViewTemplatePath, {content:data, user:req.user});
+			});
+		}
 	},
 	
 	/**

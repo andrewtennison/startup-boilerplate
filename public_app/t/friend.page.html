@@ -1,0 +1,26 @@
+
+<div class="page">
+
+	<section id="acceptedFriends"></section>
+	
+	
+	<% var class = (friends.invites)? 'show' : 'hide'  %>
+	<section id="invites">
+		<h1>Friend invites</h1>
+		<ol>
+		<% friends.invites.forEach(function(item){ %>
+			<li>
+				<%= item.name %>
+				<a class="accept" href="/friend/accept">accept</a>
+				<a class="reject" href="/friend/reject">reject</a>
+			</li>
+		<% }) %>
+		</ol>
+	</section>
+
+	<section id="possiblefriends"></section>
+
+	<section id="waiting"></section>
+	<section id="blocked"></section>
+	
+</div>

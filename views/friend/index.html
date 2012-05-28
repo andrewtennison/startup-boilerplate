@@ -1,23 +1,37 @@
 <h1>Friends already on Fancy A...</h1>
 
-<%- JSON.stringify(content.friends) %>
+<%- JSON.stringify(content.grouped) %>
 
-<ul>
+
+<% for(var key in content.grouped) {%>
+	<h2>Status = <%= key %></h2>
+	<ul>
+	<% for(var i=0; i < content.grouped[key].length; i++) {%>
+		<li>
+			<%= content.grouped[key][i].displayName %> : <%= content.grouped[key][i].id %> : <%= content.grouped[key][i].status %>
+			<% if(key === 'invited'){ %>
+				<a href="/friend/<%= content.grouped[key][i].id %>/accept">Accept invite</a>
+			<% } %>
+		</li>
+	<% } %>
+	</ul>
+<% } %>
+
+<!--ul>
 <% for(var i=0; i < content.friends.length; i++) {%>
 	<li>
    		<%= content.friends[i].displayName %> <a href="/friend/<%= content.friends[i].id %>">view</a>
 	</li>
 <% } %>
-</ul>
+</ul-->
 
 
-<ul>
+<h2>Facebook Friend IDs</h2>
+<p>
 <% for(var i=0; i < content.fb_friends.length; i++) {%>
-	<li>
-   		<%= content.fb_friends[i] %>
-	</li>
+	<%= content.fb_friends[i] %>,
 <% } %>
-</ul>
+</p>
 
 <h2>Users not yet stuck in</h2>
 <a href="">Invite some friends</a>

@@ -35,12 +35,19 @@ module.exports = {
 	index: function(req, res, next) {
 		console.log('LocationController.index')
 		
+		// get locations, sort by distance from user && popularity / votes, return just 30 > paginate
+		
 		Location.find({}, function(err, docs) {
 			var data = {
 				locations : docs,
 				flash : req.flash()
 			}
-			res.render(ViewTemplatePath, {content:data});
+			
+			if(req.xhr){
+				res.send(docs);
+			}else{
+				res.render(ViewTemplatePath, {content:data});
+			}
 		});
 	},
 	

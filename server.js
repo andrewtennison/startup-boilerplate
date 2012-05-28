@@ -19,7 +19,7 @@ var mongooseSessionStore = new SessionMongoose({
 });
 
 mongoose.connect('mongodb://localhost/boilerplate');
-
+mongoose.connection.on('error', console.error);
 
 // Initial bootstrapping
 exports.boot = function(params){
@@ -38,11 +38,26 @@ exports.boot = function(params){
 	return app;
 };
 
-
+function compileStylus (str, path) {
+	return stylus(str)
+		.set('filename', path)
+		.set('compress', false)
+		.use(nib());
+}
 function bootApplication(app) {
 	app.use(express.bodyParser());
 	app.use(express.methodOverride());
 	app.use(express.cookieParser());
+
+	// app.use(stylus.middleware({
+		// debug: true,
+    	// force: true,
+// //    	firebug: true,
+// //    	linenos: true,
+    	// src: __dirname + '/views/stylesheets',
+		// dest: __dirname + '/public_app',
+		// compile: compileStylus
+	// }));
 
 	// before sessions to prevent passport.deserializeUser being called for static assets
 	app.use(express.static(app_root + '/public_app'));
@@ -57,13 +72,6 @@ function bootApplication(app) {
 
 	app.use(passport.initialize());
 	app.use(passport.session());
-
-	app.use(stylus.middleware({
-		src: __dirname + '/public_app',
-		compile: function (str, path) {
-			return stylus(str).set('filename', path).set('compress', true).use(nib()).import('nib');
-		}
-	}));
 
 	// dynamic router
 	app.use(app.router);

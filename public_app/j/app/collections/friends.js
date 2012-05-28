@@ -11,7 +11,10 @@ define([
 	
 	var Friends = Backbone.Collection.extend({
 		model: FriendModel,
-		url: config.root + '/friend'
+		url: config.root + '/friend',
+		parse: function(json){
+			return json.friends;
+		}
 	});
 
 	return Friends;
