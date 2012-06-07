@@ -8,8 +8,8 @@
 	<section id="status" class="box">
 		<h1><%= user.displayName %></h1>
 		<img src="<%= user.photo %>" />
-		<p><%- JSON.stringify(user.status[0].title) %> // status: you fancy a pint</p>
-		<a href="#">update status</a>
+		<p>no status set</p>
+		<a class="toggle" href="#updateStatus">update status</a>
 		
 		<!-- status form -->
 		<%- partial('partials/status.form.html') %>
@@ -27,8 +27,10 @@
 	<section id="locations" class="box">
 		<header>
 			<h1>Locations</h1>
-			<a class="button iconAdd" href="/location">Add new</a>
+			<a class="toggle" href="#addLocation">Add location</a>
 		</header>
 		<ol></ol>
+		<!-- status form -->
+		<%- partial('partials/location.form.html') %>
 	</section>
 </section>

@@ -13,10 +13,16 @@ define([
 		model: FriendModel,
 		url: config.root + '/friend',
 		parse: function(json){
+			console.log(json)
+			this.grouped = json.grouped;
 			return json.friends;
+		},
+		updateGroupItem: function(id){
+			// when an individual model is updated, update the associated group item
 		}
 	});
 
 	return Friends;
+	
 });
 

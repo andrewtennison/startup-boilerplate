@@ -44,10 +44,9 @@ module.exports = {
 	 **/
 	index: function(req, res, next) {
 		console.log('controller.status.index')
-		if( !req.user ) res.send({error:{msg: 'user must be loggeed in', status:401}});
-		var status = req.user.status.sort(function(a,b){ return b.created - a.created });
+		if( !req.user ) res.send(401, {error:{msg: 'user must be loggeed in', status:401}});
 		// could check if status has expired and return nothing
-		res.send(status[0]);
+		res.send(req.user.status);
 	},
 	
 	/**
@@ -57,10 +56,8 @@ module.exports = {
 	 **/
 	show: function(req, res, next) {
 		console.log('controller.status.show')
-		User.findById(req.params.id, ['status'], function(err, user) {
-			if(err) return next(err);
-			res.send(user.toObject());
-		});
+		if(!req.user) return next(err);
+		res.send(req.user.toObject());
 	},
 	
 	/**
@@ -69,7 +66,7 @@ module.exports = {
 	 **/  	  
 	edit: function(req, res, next){
 		console.log('controller.status.edit')
-		res.send({error:'service not enabled'})
+		res.send(404,{error:'service not enabled'})
 	},
 	  
 	/**
@@ -80,7 +77,6 @@ module.exports = {
 		console.log('controller.status.update')
 	    User.findById(req.params.id, function(err, user) {
 	    	if (!user) return next(err);
-			console.log(req.body)
 
 			var newStatus = {
 				scale	: req.body.scale,
@@ -89,7 +85,7 @@ module.exports = {
 				geo		: [req.body.lat, req.body.lng]
 			};
 			
-			user.status.push(newStatus);
+			user.status = newStatus;
 
 	        user.save(function(err) {
 				if (err) {
@@ -134,8 +130,7 @@ module.exports = {
 		newStatus.expires = createExpires(newStatus);
 		newStatus.title = createTitle(req.user.displayName, newStatus);
 
-		// if current status has not expired, could update it?
-		user.status.push(newStatus);
+		user.status = newStatus;
         user.save(function(err) {
 			(err)
 				? res.send({error:err})

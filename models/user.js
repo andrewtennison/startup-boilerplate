@@ -3,6 +3,7 @@ var async = require('async'),
 	Schema = mongoose.Schema,
 	ObjectId = Schema.ObjectId,
 	mongooseTypes = require("mongoose-types"),
+	request = require('request'),
 	statusValues = require('../lib/statusValues');
 
 mongooseTypes.loadTypes(mongoose);
@@ -12,22 +13,9 @@ var Email = mongoose.SchemaTypes.Email;
 
 var Friends = new Schema({
 	displayName : String, 
-	status: {type: String, default: 'none'},
-	uid: String
-});
-
-var Status = new Schema({
-	scale : String,
-	distance : String,
-	time : String,
-    geo: {
-    	index:'2d',
-    	//required: true,
-    	type:[Number]
-    },
-    created: { type: Date, default: Date.now },
-    expires: { type: Date},
-    title: {type: String}
+	friendStatus: {type: String, default: 'none'},
+	uid: String,
+	fb_uid: String
 });
 
 var User = new Schema({
@@ -57,49 +45,114 @@ var User = new Schema({
 	visits: {type: Number, default: 0},
 	isNew: {type: Boolean, default: true},
 	
-	status:[Status] // array of obj { scale:'', distance:'', time:'', end:'calc endTime as time + scale' }
+	status:{
+		scale : String,
+		distance : String,
+		time : String,
+	    geo: {
+	    	index:'2d',
+	    	type:[Number]
+	    },
+	    created: { type: Date, default: Date.now },
+	    expires: { type: Date},
+	    title: {type: String}
+	}
 });
 
 
 /*
  to reg new user, return error + set message, pick up and redirect to register passing in info to pre fill
 */
-User.static('findByFacebook', function (accessToken, profile, callback) {
-	console.log('findByFacebook');
+
+
+User.static('findByFacebook', function (accessToken, profile, Callback) {
+	console.log('User.findByFacebook');
 
 	var U = this;
-	U.findOne({ fb_uid: profile.id }, function(err, user) {		
-		if (err){
-			console.log('user error')
-			return callback(err);
-		}else{
-			var newUser = (!user)? true : false; 
-			
-			if(!user) var user = new U();
+	// U.findOne({ fb_uid: profile.id }, function(err, user) {
+		// Callback(err, user)
+	// });
+	// return;
+	
+	async.parallel({
+		findUser: function(callback){
+			console.log('User.findByFacebook.findUser');
+			U.findOne({ fb_uid: profile.id }, function(err, user) {
+				callback(err, user)
+			});
+		},
+		getFriends: function(callback){
+			console.log('User.findByFacebook.getFriends');
+			var url = 'https://graph.facebook.com/' + profile._json.username + '/friends?access_token=' + accessToken;
+			request({url:url, json:true}, function (error, response, json) {
+				if (!error && response.statusCode == 200) {
+					console.log('facebook friends JSON')
+					
+					var arr = [],
+						l = json.data.length,
+						query = U.find({});
 
-			user.photo = 'http://graph.facebook.com/'+profile.username+'/picture';
-			user.fb_accessToken = accessToken;
-			user.fb_uid = profile.id;
-			user.fb = profile._json;
-			user.email = (profile.emails && profile.emails[0])? profile.emails[0].value : false;
-			user.displayName = profile.displayName;
-			user.name = {
-				first: profile.name.givenName,
-				last: profile.name.familyName
-			};
-			user.gender = profile.gender;
-
-			if (!newUser){
-				//user.date.lastVisited = Date.now;
-                user.visits += 1;
-                user.isNew = false;
-			};
-			user.save(function(err) {
-                if (err) throw err;
-				return callback(null, user);
-            });
+					while(l--) arr.push(json.data[l].id);
+					
+					query
+					.in('fb_uid', arr)
+					.sort('status.expires', -1)
+					.select('displayName fb_uid name status')
+					.exec(function(err,docs){
+						console.log(docs)
+						callback(null, docs)
+					})
+				}else{
+					callback(error);
+				}	
+			})
 		}
-	});
+	}, function(err, result){
+		console.log('User.findByFacebook.oncomplete');
+
+		if(err) return Callback(err);
+
+		// check if user exists, create if not
+		var newUser = (!result.findUser)? true : false; 
+		var user = result.findUser || new U();
+
+		// Set user values
+		user.photo = 'http://graph.facebook.com/'+profile.username+'/picture';
+		user.fb_accessToken = accessToken;
+		user.fb_uid = profile.id;
+		user.fb = profile._json;
+		user.email = (profile.emails && profile.emails[0])? profile.emails[0].value : false;
+		user.displayName = profile.displayName;
+		user.name = {
+			first: profile.name.givenName,
+			last: profile.name.familyName
+		};
+		user.gender = profile.gender;
+
+		if (!newUser){
+			//user.date.lastVisited = Date.now;
+            user.visits += 1;
+            user.isNew = false;
+		};
+
+		result.getFriends.forEach(function(doc){
+			var add = true;
+			user.friends.forEach(function(friend,index){
+				// if facebook user is friend, update existing user else add to list
+				if(friend.id === doc.id) {
+					console.log(doc.displayName + ' is already friend / - i = ' + index);
+					add = false;
+					user.friends[index] = doc;
+				}
+			});
+			doc.uid = doc.id;
+			if(add) user.friends.push( doc );
+		});
+		
+		user.save(function(err) {
+			return Callback(err, user);
+        });
+	})
 });
 
 function findInArray(arr, prop, value){
@@ -113,6 +166,12 @@ function findInArray(arr, prop, value){
 // Status = none / invite / invited / ignore / friend / block
 User.static('updateFriendStatus', function(user, friendID, userStatus, friendStatus, callback){
 	console.log('updateFriendStatus');
+	
+	console.log(user.friends)
+	console.log('friendID = ' + friendID)
+	console.log('userStatus = ' + userStatus)
+	console.log('friendStatus = ' + friendStatus)
+	
 	var U = this;
 
 	function checkStatus(curStatus){
@@ -132,7 +191,7 @@ User.static('updateFriendStatus', function(user, friendID, userStatus, friendSta
 		updateUserList: function(onComp){ 
 			console.log(':: updateFriendStatus => updateUserList');
 			// Update + Save
-			Friend.status = userStatus;		
+			Friend.friendStatus = userStatus;		
 			user.save(function(err){
 				if(err) onComp( err );
 				else onComp(null, Friend);
@@ -150,11 +209,11 @@ User.static('updateFriendStatus', function(user, friendID, userStatus, friendSta
 				// if no friend, create + add
 				var newUser = {
 					displayName : user.displayName,
-					status : friendStatus,
+					friendStatus : friendStatus,
 					_id : user.id
 				};
 				if( Friend ) {
-					Friend.status = friendStatus;
+					Friend.friendStatus = friendStatus;
 				} else {
 					doc.friends.push( newUser );
 				}

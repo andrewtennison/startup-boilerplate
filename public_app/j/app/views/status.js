@@ -5,57 +5,50 @@ define([
 	'backbone',
 	'vm',
 	'events',
+	'views/form',
 	'text!templates/status.item.html'
-], function($, _, Backbone, Vm, Events, statusItemTpl){
+], function($, _, Backbone, Vm, Events, FormView, statusItemTpl){
 	
-	var prettify = function(time){
-		var date = new Date(),
-			exp = new Date(time),
-			s = (exp-date) / 1000;
-		
-		if(exp < date) return '0, in past';
-		
-		var h = Math.floor(s / 3600);
-		s = s - h * 3600;
-		var m = Math.floor(s / 60);
-		s = Math.ceil(s - m * 60);
-		
-		return h + 'h : ' + m + 'm : ' + s +'s';
-	};
-	
-	var StatusView = Backbone.View.extend({
+	var StatusView = FormView.extend({
 		el: '#status',
 		template: _.template(statusItemTpl),
 		initialize: function(){
 			console.info('FriendView.init');
 			var AppState = this.options.appState;
-			_.bindAll(this, 'render', 'updateView', 'postForm');
-			
+			_.bindAll(this, 'render', 'updateView', 'postForm', 'clearForm', 'showErrors', 'toggleHref');
+
 			this.model = AppState.get('status');
-			this.model.bind('change', this.updateView)
+			this.model.bind('change', this.updateView);
 			this.model.fetch();
 		},
-		render: function(){
-			var json = this.model.toJSON();
-			json.expires = prettify(json.expires);
-			this.$('p').html( this.template(json) );
-		},
-		events: {
-			'submit form' : 'postForm'
+		showErrors: function(){
+			this.$('p').html();
 		},
 		updateView: function(){
-			this.render();
+			var exp = this.model.get('expiresPretty');
+			
+			var html = (exp === 'false')
+				? 'Please set your status'
+				: this.template(this.model.toJSON());
+			
+			this.$('p:first').html( html );
 		},
 		postForm: function(e){
 			e.preventDefault();
+			
+			var $form = $(e.target);
+			$form.addClass('loading');
+			
 			var self = this,
 				data = $(e.target).serialize();
-
+			
+			// navigator.success
 			function success(pos){
 				self.$('input[name="lat"]').val(pos.coords.latitude);
 				self.$('input[name="lng"]').val(pos.coords.longitude);
 				send();
 			};
+			// navigator.error
 			function error(msg){
 				console.error(msg)
 				send();
@@ -64,6 +57,7 @@ define([
 				// can use save as i dont want all values posted, as some are calculated by the server
 				// possible fix, ignor incoming values for these elements! Then model.save(attr)
 				$.post('/status', data, function(res){
+					$form.removeClass('loading');
 					if(!res.error) self.model.set(res);
 				});
 			}
@@ -75,6 +69,7 @@ define([
 			}
 				
 		}
+		// countdownTimer(){} // live countdown of time left on status
 	});
 	
 	return StatusView;

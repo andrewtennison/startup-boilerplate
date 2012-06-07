@@ -24,77 +24,29 @@ module.exports = {
 	index: function(req, res, next) {
 		console.log('FriendController.index')
 		if( !req.user ) return res.redirect('/');
-		
-		//console.log(req.user)
-		
+
 		function groupFriends(arr){
 			var l = arr.length,
 				obj = {};
 				
 			while(l--){
-				var status = arr[l].status;
-				if( !obj[status] ) obj[status] = [];
-				obj[status].push( arr[l] );
+				var friendStatus = arr[l].friendStatus;
+				if( !obj[friendStatus] ) obj[friendStatus] = [];
+				obj[friendStatus].push( arr[l] );
 			}
 			return obj;
 		}
 		
-		function findRegisteredFriends(arr, callback){
-			var query = User.find({});
-			query
-			.in('fb_uid', arr)
-			.select('displayName')
-			.exec(function(err,docs){
-				// on complete of all calls return results
-				//docs.forEach(function(doc){ console.log(doc) });
-				//(r.error)? res.send(r.error) : res.json(r.success);
-				docs.forEach(function(doc){
-					var add = true;
-					req.user.friends.forEach(function(f){
-						if(f.id === doc.id) add = false;
-					});
-					doc.uid = doc.id;
-					if(add) req.user.friends.push( doc );
-				});
+		var data = {
+			friends : req.user.friends,
+			grouped : groupFriends(req.user.friends)
+		}
 
-				req.user.fb_friends = arr;
-				req.user.save(function(err) {
-					var obj = groupFriends(req.user.friends);
-					
-					var data = {
-						fb_friends : arr,
-						friends : req.user.friends,
-						grouped : obj
-					}
-
-					if(req.xhr){
-						res.send(data)
-					}else{
-						res.render(ViewTemplatePath, {layout: 'layout.app.html', content : data})
-					}
-				});
-			})
-		};
-
-		if(req.session.fb_friends){
-			findRegisteredFriends(req.session.fb_friends)
+		if(req.xhr){
+			res.send(data)
 		}else{
-			var url = 'https://graph.facebook.com/' + req.user.fb.username + '/friends?access_token=' + req.user.fb_accessToken;
-			request({url:url, json:true}, function (error, response, json) {
-				if (!error && response.statusCode == 200) {
-					
-					req.session.fb_friends = json;
-					
-					var arr = [],
-						l = json.data.length;
-					while(l--){ arr.push( json.data[l].id ) };
-					req.session.fb_friends = arr;
-					findRegisteredFriends(arr)
-				}	
-			})
-		};
-
-		
+			res.render(ViewTemplatePath, {layout: 'layout.app.html', content : data, user: req.user})
+		}
 	},
 	
 	/**
@@ -130,7 +82,7 @@ module.exports = {
 		// check users has friend
 		User.updateFriendStatus(req.user, req.params.id, 'invite', 'invited', function(err, friend){
 			if(err) return res.send({error: err});
-			res.send('invite worked - ' + friend.status)
+			res.send('invite worked - ' + friend.friendStatus)
 		})
 	},
 
@@ -140,7 +92,7 @@ module.exports = {
 		// check users has friend
 		User.updateFriendStatus(req.user, req.params.id, 'friend', 'friend', function(err, friend){
 			if(err) return res.send({error: err});
-			res.send('invite accepted - ' + friend.status)
+			res.send('invite accepted - ' + friend.friendStatus)
 		})
 	},
 
@@ -148,7 +100,7 @@ module.exports = {
 	/**
 	 * Edit action, returns a form via views/users/edit.html view no JSON view.
 	 * Default mapping to GET '/user/:id/edit'
-	 **/  	
+	 **/
 	edit: function(req, res, next){
 		req.flash('error','no edit method on friends!');
 		res.send('false');

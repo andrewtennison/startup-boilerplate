@@ -147,11 +147,7 @@ function router(req, res, next) {
  */
 
 function index(req, res, next) {
-
 	console.log('AppController.index')
-	
 	var content = {};
-	
-	res.render('app', {content:content});
-	
+	res.render('app', {content:content, user:req.user});
 };

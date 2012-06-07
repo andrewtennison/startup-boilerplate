@@ -3,8 +3,9 @@ require.config({
 	paths: {
 		// Major libraries
 		jquery: '/j/libs/jquery/jquery-min',
-		underscore: '/j/libs/underscore/underscore-min', // https://github.com/amdjs
-		backbone: '/j/libs/backbone/backbone-min', // https://github.com/amdjs
+		underscore: '/j/libs/underscore/underscore-min',	// https://github.com/amdjs
+		backbone: '/j/libs/backbone/backbone-min',			// https://github.com/amdjs
+		syphon: '/j/libs/backbone/backbone.syphon.min',	// https://github.com/derickbailey/backbone.syphon
 
 		// Require.js plugins
 		text: '/j/libs/require/text',

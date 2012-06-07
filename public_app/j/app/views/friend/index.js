@@ -35,7 +35,14 @@ define([
 		addAll: function(){
 			console.log('FriendView.addAll')
 			this.$('ol').empty();
-			this.collection.each(this.addOne);
+			
+			var friends = this.collection.filterByGroup('friend'),
+				invited = this.collection.filterByGroup('invited'),
+				unconnected = this.collection.filterByGroup('none');
+			
+			//friends.each(this.addOneFriend)
+			
+			//this.collection.each(this.addOne);
 		}
 	});
 	

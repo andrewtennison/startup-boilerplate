@@ -34,7 +34,9 @@ define([
 		addAll: function(){
 			console.log('FriendView.addAll')
 			this.$('ol').empty();
-			this.collection.each(this.addOne);
+			
+			var friends = this.collection.where({friendStatus: "friend"});
+			if(friends) friends.forEach(this.addOne);
 		}
 	});
 	

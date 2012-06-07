@@ -16,7 +16,9 @@ passport.use(new FacebookStrategy({
 	},
 	function(accessToken, refreshToken, profile, done) {
 		process.nextTick(function () {
+			console.log('findByFacebook called - ' + accessToken)
 			User.findByFacebook( accessToken, profile, function(err, user){
+				console.log('findByFacebook returned')
 				if (err) 	return done(err);
 				if (!user)  return done(null, false, { message: 'Unknown user' });
 			  	//if (!user.validPassword(password)) return done(null, false, { message: 'Invalid password' });
@@ -42,12 +44,17 @@ passport.deserializeUser(function(id, done) {
 
 module.exports = {
 
-	indexFacebook : passport.authenticate('facebook', { scope: ['email','user_status', 'user_photos', 'user_activities', 'user_birthday', 'read_friendlists', 'publish_checkins', 'publish_stream'] }),
+	indexFacebook : passport.authenticate('facebook', { scope: ['email', 'user_status', 'user_photos', 'user_activities', 'user_birthday', 'read_friendlists', 'publish_checkins', 'publish_stream'] }),
 
 	callbackFacebook : passport.authenticate('facebook', { failureRedirect: '/login' }),
 	
 	callbackFacebookCallback : function(req, res) {
 		// Successful authentication, redirect home.
+		console.log('//////////////// facebook callback on complete ')
+		console.log('is user new, could redirect somewhere else? - ' + req.user.isNew)
 		res.redirect('/home');
 	}
 };
+
+
+

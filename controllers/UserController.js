@@ -59,11 +59,9 @@ module.exports = {
 	 * Default mapping to GET '/user/:id/edit'
 	 **/  	
 	edit: function(req, res, next){
-		User.findById(req.params.id, function(err, user) {
-			if(err) return next(err);
-	      	var data = { user:user };
-			res.render(ViewTemplatePath + "/edit",{content:data, user:user});
-		});
+	  	if(!req.user) return res.send(403,{error:'auth required'});
+	  	var data = { user:req.user };
+		res.render(ViewTemplatePath + "/edit",{content:data});
 	},
 	
 	/**
@@ -74,8 +72,6 @@ module.exports = {
 
 	  User.findById(req.params.id, function(err, user) {
 	  	if (!user) return next(err);
-			console.log(req.body)
-			console.log(req.params)
 			
 			user.displayName = req.body.displayName;
 			user.email = req.body.email;
@@ -87,6 +83,8 @@ module.exports = {
 				    	res.redirect('/users');
 				    	return;
 				}
+				
+//				console.log(user.toObject())
 	  		
 				switch (req.params.format) {
 				  case 'json':
@@ -151,7 +149,7 @@ module.exports = {
 	  	  	req.flash('info','User deleted');
 	  			res.send('true');
 	  		}    	        
-	 	    	}); 
+	 	    }); 
 		});
 		
 	}

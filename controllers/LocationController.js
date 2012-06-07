@@ -36,6 +36,13 @@ module.exports = {
 		console.log('LocationController.index')
 		
 		// get locations, sort by distance from user && popularity / votes, return just 30 > paginate
+		// var query = Location.find({});
+		// query
+		// .sort()
+		// .limit(30)
+		// .exec(function(err,docs){
+
+
 		
 		Location.find({}, function(err, docs) {
 			var data = {
@@ -148,20 +155,22 @@ module.exports = {
 			console.log('locationController.create > save')
 			if (err) {
 				console.log(err.errors)
-				req.flash('error', err.errors);
-				res.redirect('back');
-				return;
+				if(req.xhr){
+					res.json(err, 400);
+					return;
+				}else{
+					req.flash('error', err.errors);
+					res.redirect('back');
+					return;
+				}
+			};
+			
+			if(req.xhr){
+				res.send(location.toObject());
+			}else{
+				req.flash('info','Location created');
+				res.redirect('/location/' + location.id);
 			}
-
-			switch (req.params.format) {
-				case 'json':
-					res.send(location.toObject());
-					break;
-
-				default:
-					req.flash('info','Location created');
-					res.redirect('/location/' + location.id);
-			 }
 		});
 	},
 		

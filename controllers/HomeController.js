@@ -9,10 +9,6 @@ var mongoose = require('mongoose'),
 	ViewTemplatePath = 'home',
 	statusValues = require('../lib/statusValues');
 
-console.log(statusValues)
-
-var data = statusValues;
-
 module.exports = {
 
 	index : function(req,res,next){
@@ -21,11 +17,9 @@ module.exports = {
 			return;
 		}
 		
-		//req.user.status = req.user.status.pop();
 		var status = req.user.status;
-//		req.user.status = status.sort(function(a,b){return (a.created - back.created);});		
 
-		res.render(ViewTemplatePath, {layout: 'layout.app.html', content:data, user:req.user});
+		res.render(ViewTemplatePath, {layout: 'layout.app.html', content:statusValues, user:req.user});
 	}
 	
 };
