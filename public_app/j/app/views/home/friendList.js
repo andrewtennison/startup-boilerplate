@@ -13,7 +13,7 @@ define([
 			console.info('FriendView.init');
 			var AppState = this.options.appState;
 			
-			 _.bindAll(this, 'render', 'addOne', 'addAll');
+			 _.bindAll(this, 'addOne', 'addAll');
 			
 			this.collection = AppState.get('friends');
 			this.collection.on('add', this.addOne);
@@ -21,22 +21,20 @@ define([
 			this.collection.fetch();
 		},
 		events: {},
-		render: function(){
-			console.info('FriendView.render')
-			// this.$el.append(this.template( this.model.toJSON() ));
-		    // return this;
-			//$(this.el).html(layoutTemplate);
-		},
 		addOne: function(item, index){
 			console.log('FriendView.addOne')
+			console.log(item.toJSON())
+			// check for title attribute on status + if not expired
+			//if( !item.get('status').title ) return;
 			this.$('ol').append(this.template( item.toJSON() ));
 		},
 		addAll: function(){
 			console.log('FriendView.addAll')
 			this.$('ol').empty();
 			
-			var friends = this.collection.where({friendStatus: "friend"});
-			if(friends) friends.forEach(this.addOne);
+			// var friends = this.collection.where({friendStatus: "friend"});
+			// if(friends) friends.forEach(this.addOne);
+			this.collection.each(this.addOne);
 		}
 	});
 	

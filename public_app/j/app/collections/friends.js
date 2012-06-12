@@ -15,10 +15,13 @@ define([
 		parse: function(json){
 			console.log(json)
 			this.grouped = json.grouped;
-			return json.friends;
+			return json._friends;
 		},
 		updateGroupItem: function(id){
 			// when an individual model is updated, update the associated group item
+		},
+		comparator: function(friend) {
+			return friend.get('status').expires;
 		}
 	});
 

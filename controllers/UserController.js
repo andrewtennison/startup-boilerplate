@@ -67,9 +67,10 @@ module.exports = {
 	/**
 	 * Update action, updates a single item and redirects to Show or returns the object as json
 	 * Default mapping to PUT '/user/:id', no GET mapping	 
-	 **/  
+	 **/
 	update: function(req, res, next){
-
+		if(req.user.id !== req.params.id) return res.send(401, {error:{msg: 'user must be loggeed in', status:401}});
+		
 	  User.findById(req.params.id, function(err, user) {
 	  	if (!user) return next(err);
 			
@@ -109,19 +110,19 @@ module.exports = {
 		user.save(function(err) {
 		 
 			if (err) {
-	  	req.flash('error','Could not create user: ' + err);
-	    	res.redirect('/users');
-	    	return;
+	  			req.flash('error','Could not create user: ' + err);
+	    		res.redirect('/users');
+	    		return;
 			}
 	
-		  switch (req.params.format) {
-		    case 'json':
-		      res.send(user.toObject());
-		      break;
+			switch (req.params.format) {
+		    	case 'json':
+					res.send(user.toObject());
+		    		break;
 	
-		    default:
-		  	req.flash('info','User created');
-		    	res.redirect('/user/' + user.id);
+				default:
+					req.flash('info','User created');
+					res.redirect('/user/' + user.id);
 			 }
 		});	
 		

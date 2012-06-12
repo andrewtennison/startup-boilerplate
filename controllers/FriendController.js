@@ -25,28 +25,33 @@ module.exports = {
 		console.log('FriendController.index')
 		if( !req.user ) return res.redirect('/');
 
-		function groupFriends(arr){
-			var l = arr.length,
-				obj = {};
+		// function groupFriends(arr){
+		// 	if(!arr) return {};
+		// 	var l = arr.length,
+		// 		obj = {};
 				
-			while(l--){
-				var friendStatus = arr[l].friendStatus;
-				if( !obj[friendStatus] ) obj[friendStatus] = [];
-				obj[friendStatus].push( arr[l] );
-			}
-			return obj;
-		}
-		
-		var data = {
-			friends : req.user.friends,
-			grouped : groupFriends(req.user.friends)
-		}
+		// 	while(l--){
+		// 		var friendStatus = arr[l].friendStatus;
+		// 		if( !obj[friendStatus] ) obj[friendStatus] = [];
+		// 		obj[friendStatus].push( arr[l] );
+		// 	}
+		// 	return obj;
+		// }
 
-		if(req.xhr){
-			res.send(data)
-		}else{
-			res.render(ViewTemplatePath, {layout: 'layout.app.html', content : data, user: req.user})
-		}
+
+//		User.getFacebookFriends(req.user, function(user){
+
+		User.synFriendsList(req.user, function(user){
+
+			var data = {
+				friends : [], //user.friends,
+				grouped : {} //groupFriends(user.friends)
+			};
+
+			(req.xhr)
+				? res.send(user)
+				: res.render(ViewTemplatePath, {layout: 'layout.app.html', content : data, user: user});
+		});
 	},
 	
 	/**

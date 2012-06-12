@@ -72,29 +72,10 @@ module.exports = {
 	/**
 	 * Update action, updates a single item and redirects to Show or returns the object as json
 	 * Default mapping to PUT '/user/:id', no GET mapping	 
-	 **/  
+	 **/
 	update: function(req, res, next){
-		console.log('controller.status.update')
-	    User.findById(req.params.id, function(err, user) {
-	    	if (!user) return next(err);
-
-			var newStatus = {
-				scale	: req.body.scale,
-				distance: req.body.distance,
-				time	: req.body.time,
-				geo		: [req.body.lat, req.body.lng]
-			};
-			
-			user.status = newStatus;
-
-	        user.save(function(err) {
-				if (err) {
-			   		res.send({error:err});
-					return;
-				}
-				res.send(user.status.toObject());
-			});
-		});
+		console.log('controller.status.edit')
+		res.send(404,{error:'service not enabled'})
 	},
 	  
 	/**
@@ -144,7 +125,7 @@ module.exports = {
 	 **/ 
 	destroy: function(req, res, next){
 		console.log('controller.status.destory')
-		res.send({error:'service not enabled'})
+		res.send(404,{error:'service not enabled'})
 	}
 	
 };

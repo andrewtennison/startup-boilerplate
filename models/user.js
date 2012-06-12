@@ -4,19 +4,38 @@ var async = require('async'),
 	ObjectId = Schema.ObjectId,
 	mongooseTypes = require("mongoose-types"),
 	request = require('request'),
-	statusValues = require('../lib/statusValues');
+	statusValues = require('../lib/statusValues'),
+	_ = require('underscore')._;
+
 
 mongooseTypes.loadTypes(mongoose);
 
-
 var Email = mongoose.SchemaTypes.Email;
 
-var Friends = new Schema({
-	displayName : String, 
-	friendStatus: {type: String, default: 'none'},
-	uid: String,
-	fb_uid: String
-});
+// var FriendSchema = new Schema({
+// 	_friend: { type: Schema.ObjectId, ref: 'userModel' },
+// 	rel: {type: String, default: 'none'},
+// 	fb_uid: String
+// });
+
+/*
+
+friends > get FB list
+- get update user.fb_friends[];
+
+friends > find New
+- get users facebook friends
+- search against users
+	- return all
+- loop through, if existing friend ignor else add to list
+
+firends > get Status
+
+
+user.friends = [{id > get user / relation}]
+user.relations = [{id/status}]
+
+*/
 
 var User = new Schema({
 	// eMail address
@@ -26,11 +45,6 @@ var User = new Schema({
 		lastVisited: { type: Date, default: Date.now }
 	},
 
-	// Name
-	name: {
-		first: { type: String, required: true },
-		last: { type: String, required: true }
-	},
 	displayName: { type: String },
 	gender: {type: String},
 	photo: {type: String},
@@ -38,10 +52,12 @@ var User = new Schema({
 	// Facebook	
 	fb_uid: {type:String, unique: true, index: true},
 	fb: {},
-	fb_friends: {},
+	fb_friends: [],
 	fb_accessToken: { type: String },
 	
-	friends: [Friends],
+	_friends: [{ type: Schema.ObjectId, ref: 'User', unique:true }],
+	relationships: {type: String},
+
 	visits: {type: Number, default: 0},
 	isNew: {type: Boolean, default: true},
 	
@@ -53,68 +69,95 @@ var User = new Schema({
 	    	index:'2d',
 	    	type:[Number]
 	    },
-	    created: { type: Date, default: Date.now },
+	    created: { type: Date },
 	    expires: { type: Date},
 	    title: {type: String}
 	}
-});
+}); 
 
 
 /*
  to reg new user, return error + set message, pick up and redirect to register passing in info to pre fill
 */
 
+User.static('getFacebookFriends', function(user, Callback){
+	console.log('getFacebookFriends');
+	// get facebook friends from FB.API
+	var Model = this,
+		url = 'https://graph.facebook.com/' + user.fb.username + '/friends?access_token=' + user.fb_accessToken;
+
+	request({url:url, json:true}, function (error, response, json) {
+		if (!error && response.statusCode == 200) {
+			console.log('facebook friends JSON')
+			var FB_arr = _.pluck(json.data, 'id');
+			user.fb_friends = FB_arr;
+			Callback(FB_arr)
+
+		}else{
+			console.log('User.findByFacebook.getFriends');
+			Callback(error);
+		}	
+	})
+});
+
+User.static('synFriendsList', function(reqUser, callback){
+	console.log('synFriendsList');
+
+	var Model = this;
+
+	Model.getFacebookFriends(reqUser, function( fb_friends ){
+		reqUser.fb_friends = fb_friends;
+
+		var friendIds = _.pluck(reqUser.friends, '_id'),
+			diff = _.without(fb_friends, friendIds);
+
+		Model
+		.where('fb_uid').in(fb_friends)
+		.where('_id').in(friendIds)
+		.select('displayName fb_uid')
+		.run(function(err, docs){
+			console.log('Get Matching Users from FB_UID');
+			console.log(docs);
+
+			docs.forEach(function(doc){ reqUser._friends.push(doc._id) });
+
+			reqUser.save(function(error){
+				console.log('synFriendsList.save');
+				if(error) console.log(error);
+
+				Model.populateFriends(reqUser, function(user){
+					callback(user);
+				})
+			})
+		}) // END run 
+	}) // END getFacebookFriends
+});
+
+
+User.static('populateFriends', function(reqUser, callback){
+	// compare user.fb_friends against users in DB + compare with friends list
+	// run populate on friends list to update details
+	var Model = this;
+
+	Model
+	.findById(reqUser)
+	.populate('_friends', ['status', 'displayName', 'fb_uid', 'photo'])
+	.run(function (err, user) {
+		console.log('user populated')
+		console.log(user._friends)
+		callback(user)
+	})
+});
+
 
 User.static('findByFacebook', function (accessToken, profile, Callback) {
 	console.log('User.findByFacebook');
 
 	var U = this;
-	// U.findOne({ fb_uid: profile.id }, function(err, user) {
-		// Callback(err, user)
-	// });
-	// return;
-	
-	async.parallel({
-		findUser: function(callback){
-			console.log('User.findByFacebook.findUser');
-			U.findOne({ fb_uid: profile.id }, function(err, user) {
-				callback(err, user)
-			});
-		},
-		getFriends: function(callback){
-			console.log('User.findByFacebook.getFriends');
-			var url = 'https://graph.facebook.com/' + profile._json.username + '/friends?access_token=' + accessToken;
-			request({url:url, json:true}, function (error, response, json) {
-				if (!error && response.statusCode == 200) {
-					console.log('facebook friends JSON')
-					
-					var arr = [],
-						l = json.data.length,
-						query = U.find({});
-
-					while(l--) arr.push(json.data[l].id);
-					
-					query
-					.in('fb_uid', arr)
-					.sort('status.expires', -1)
-					.select('displayName fb_uid name status')
-					.exec(function(err,docs){
-						console.log(docs)
-						callback(null, docs)
-					})
-				}else{
-					callback(error);
-				}	
-			})
-		}
-	}, function(err, result){
-		console.log('User.findByFacebook.oncomplete');
-
-		if(err) return Callback(err);
-
+	U.findOne({ fb_uid: profile.id }, function(err, user) {
 		// check if user exists, create if not
-		var newUser = (!result.findUser)? true : false; 
-		var user = result.findUser || new U();
+		var newUser = (!user)? true : false; 
+		var user =  user || new U();
 
 		// Set user values
 		user.photo = 'http://graph.facebook.com/'+profile.username+'/picture';
@@ -134,25 +177,11 @@ User.static('findByFacebook', function (accessToken, profile, Callback) {
             user.visits += 1;
             user.isNew = false;
 		};
-
-		result.getFriends.forEach(function(doc){
-			var add = true;
-			user.friends.forEach(function(friend,index){
-				// if facebook user is friend, update existing user else add to list
-				if(friend.id === doc.id) {
-					console.log(doc.displayName + ' is already friend / - i = ' + index);
-					add = false;
-					user.friends[index] = doc;
-				}
-			});
-			doc.uid = doc.id;
-			if(add) user.friends.push( doc );
-		});
-		
 		user.save(function(err) {
+			console.log('User.findByFacebook.save')
 			return Callback(err, user);
         });
-	})
+	});
 });
 
 function findInArray(arr, prop, value){
@@ -164,6 +193,8 @@ function findInArray(arr, prop, value){
 }
 
 // Status = none / invite / invited / ignore / friend / block
+
+// change to updateRelationship
 User.static('updateFriendStatus', function(user, friendID, userStatus, friendStatus, callback){
 	console.log('updateFriendStatus');
 	
@@ -231,14 +262,22 @@ User.static('updateFriendStatus', function(user, friendID, userStatus, friendSta
 	});
 });
 
+User.static('getFriendsStatus', function(user, callback){
+	var friends = user.friends;
+	var relations = user.relationships;
+	
+	// populate friends
+	// apply relationship status to friend
+	// return
+	
+})
+
 User.pre('save', function(next){
 	console.log('saving user ///////////////////////////// ')
 	next();
 });
 
 var userModel = mongoose.model('User', User);
-
-// Passport serialize / deserialize user session
 var passport = require('passport');
 
 passport.serializeUser(function(user, done) {

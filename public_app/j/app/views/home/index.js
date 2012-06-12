@@ -5,9 +5,9 @@ define([
 	'backbone',
 	'vm',
 	'events',
-	'views/location',
-	'views/friendList',
-	'views/status',
+	'views/home/location',
+	'views/home/friendList',
+	'views/home/status',
 	'text!templates/layout.html'
 ], function($, _, Backbone, Vm, Events, LocationView, FriendView, StatusView, layoutTemplate){
 	

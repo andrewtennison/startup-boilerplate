@@ -6,7 +6,7 @@ define([
 	'vm',
 	'appConfig',
 	'models/appState',
-	'views/app',
+	'views/home/index',
 ], function ($, _, Backbone, Vm, Config, AppStateModel, AppView) {
 	var appState; // scope global to file, set in init
 	
