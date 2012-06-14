@@ -1,0 +1,7 @@
+<span><%= title %></span>
+
+<% if(expiresPretty) { %>
+<span>status expires in: <%= expiresPretty.h %>h : <%= expiresPretty.m %>min : <%= expiresPretty.s %>sec</span>
+<% } else { %>
+<span>please set your status</span>	
+<% } %>

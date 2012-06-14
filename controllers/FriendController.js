@@ -7,7 +7,9 @@ var mongoose = require('mongoose'),
 	User = mongoose.model('User'),
 	ViewTemplatePath = 'friend',
 	request = require('request'),
-	async = require('async');
+	async = require('async'),
+	bayeux = require('../utils/faye');
+
 
 module.exports = {
 
@@ -23,54 +25,45 @@ module.exports = {
 	 **/
 	index: function(req, res, next) {
 		console.log('FriendController.index')
-		//console.log(req.user)
-		
-		function findRegisteredFriends(arr, callback){
-			var query = User.find({});
-			query
-			.in('fb_uid', arr)
-			.select('displayName')
-			.exec(function(err,docs){
-				// on complete of all calls return results
-				//docs.forEach(function(doc){ console.log(doc) });
-				//(r.error)? res.send(r.error) : res.json(r.success);
-				if(req.xhr){
-					res.json(docs);
-				}else{
-					//req.flash('info','Friend found');
-					var data = {
-						fb_friends : docs,
-						friends : req.user.friends 
-					}
-					res.render(ViewTemplatePath, {content : data});
+		if( !req.user ) return res.redirect('/');
+
+		// function groupFriends(arr){
+		// 	if(!arr) return {};
+		// 	var l = arr.length,
+		// 		obj = {};
+				
+		// 	while(l--){
+		// 		var friendStatus = arr[l].friendStatus;
+		// 		if( !obj[friendStatus] ) obj[friendStatus] = [];
+		// 		obj[friendStatus].push( arr[l] );
+		// 	}
+		// 	return obj;
+		// }
+
+
+//		User.getFacebookFriends(req.user, function(user){
+
+		User.synFriendsList(req.user, function(user){
+
+			// bind client to subscriptions from friends
+			user._friends.forEach(function(friend){
+				if(bayeux.getClient()._channels._channels && !bayeux.getClient()._channels._channels['/status/' + friend._id]){
+					bayeux.getClient().subscribe('/status/' + friend._id, function(msg){
+						console.log('>>>>>>>>>>>>>>>>>>>> FriendController.index > '+req.user.displayName+' > subscriber - /status/' + friend._id + ' >> ' + msg.user + ' <<<<<<<<<<<<<<<<<<<<');
+					})
 				}
-			})
-		};
-		
-		if( !req.isAuthenticated() ){
-			res.redirect('/');
-		}else{
-			
-			// get FB friends, query, remove matched with friends to find new friends to add
-			// get local friends, get statuses OR setup sockets to transmit data
-			if(req.session.fb_friends){
-				findRegisteredFriends(req.session.fb_friends)
-			}else{
-				var url = 'https://graph.facebook.com/' + req.user.fb.username + '/friends?access_token=' + req.user.fb_accessToken;
-				request({url:url, json:true}, function (error, response, json) {
-					if (!error && response.statusCode == 200) {
-						
-						req.session.fb_friends = json;
-						
-						var arr = [],
-							l = json.data.length;
-						while(l--){ arr.push( json.data[l].id ) };
-						req.session.fb_friends = arr;
-						findRegisteredFriends(arr)
-					}	
-				})
+			});
+
+
+			var data = {
+				friends : [], //user.friends,
+				grouped : {} //groupFriends(user.friends)
 			};
-		} 
+
+			(req.xhr)
+				? res.send(user)
+				: res.render(ViewTemplatePath, {layout: 'layout.app.html', content : data, user: user});
+		});
 	},
 	
 	/**
@@ -78,125 +71,85 @@ module.exports = {
 	 * Default mapping to GET '/user/:id'
 	 * For JSON use '/user/:id.json'
 	 **/	
-	show: function(req, res, next) {	  		  
+	show: function(req, res, next) {			
+		
+		var friends = req.user.friends,
+			friend = false;
+		
+		friends.forEach(function(f){
+			if(f.id === req.params.id) friend = f;
+		});
+		
+		if( !friend ){
+			return next(new Error('you have no friends matching that ID'));
+			return;
+		};
+		
+		User.findById(friend.id, function(err,doc){
+			if(err) return next(err);
 			
-		  User.findById(req.params.id, function(err, user) {
-			  
-			  if(err) return next(err);
-			  
-		      switch (req.params.format) {
-		        case 'json':
-		          res.send(user.toObject());
-		          break;
-	
-		        default:
-		        	res.render(ViewTemplatePath + "/show",{user:user});
-		      }
-		      
-		  });
-		      
+			var data = {friend: friend, user:doc };
+			res.render(ViewTemplatePath + "/show",{content:data});
+		})
 	},
+	
+	invite: function(req, res, next){
+		if( !req.user ) next(new Error('invite failed, not logged in'));
+		
+		// check users has friend
+		User.updateFriendStatus(req.user, req.params.id, 'invite', 'invited', function(err, friend){
+			if(err) return res.send({error: err});
+			res.send('invite worked - ' + friend.friendStatus)
+		})
+	},
+
+	accept: function(req, res, next){
+		if( !req.user ) next(new Error('invite failed, not logged in'));
+		
+		// check users has friend
+		User.updateFriendStatus(req.user, req.params.id, 'friend', 'friend', function(err, friend){
+			if(err) return res.send({error: err});
+			res.send('invite accepted - ' + friend.friendStatus)
+		})
+	},
+
 	
 	/**
 	 * Edit action, returns a form via views/users/edit.html view no JSON view.
 	 * Default mapping to GET '/user/:id/edit'
-	 **/  	  
+	 **/
 	edit: function(req, res, next){
-		  User.findById(req.params.id, function(err, user) {
-			  if(err) return next(err);
-			  res.render(ViewTemplatePath + "/edit",{user:user});
-		});
+		req.flash('error','no edit method on friends!');
+		res.send('false');
 	},
-	  
+	
 	/**
 	 * Update action, updates a single item and redirects to Show or returns the object as json
 	 * Default mapping to PUT '/user/:id', no GET mapping	 
-	 **/  
+	 **/ 
+	 
+	// PUT => friend/:id?action=invite
 	update: function(req, res, next){
-	    
-		
-		
-	    User.findById(req.params.id, function(err, user) {
-	        
-	    	if (!user) return next(err);
-	        
-	    	user.name = req.body.user.name;
-	    	
-	        user.save(function(err) {
-	        
-	    	  if (err) {
-	    		  console.log(err);
-	        	  req.flash('error','Could not update user: ' + err);
-	          	  res.redirect('/users');
-	          	  return;
-	    	  }
-	    		
-	          switch (req.params.format) {
-	            case 'json':
-	              res.send(user.toObject());
-	              break;
-	            default:
-	              req.flash('info', 'Friend updated');
-	              res.redirect('/user/' + req.params.id);
-	          }
-	        });
-	      });
+		req.flash('error','no update method on friends!');
+		res.send('false');
 	},
-	  
+	
 	/**
 	 * Create action, creates a single item and redirects to Show or returns the object as json
 	 * Default mapping to POST '/users', no GET mapping	 
 	 **/  
 	create: function(req, res, next){
-		
-		  var user = new Friend(req.body.user);
-		  
-		  user.save(function(err) {
-		   
-			if (err) {
-	    	  req.flash('error','Could not create user: ' + err);
-	      	  res.redirect('/users');
-	      	  return;
-			}
-	
-		    switch (req.params.format) {
-		      case 'json':
-		        res.send(user.toObject());
-		        break;
-	
-		      default:
-		    	  req.flash('info','Friend created');
-		      	  res.redirect('/user/' + user.id);
-			 }
-		  });	  
-		  
+		req.flash('error','no create method on friends!');
+		res.send('false');
 	},
-	  
+	
 	/**
 	 * Delete action, deletes a single item and redirects to index
 	 * Default mapping to DEL '/user/:id', no GET mapping	 
 	 **/ 
 	destroy: function(req, res, next){
-		  
-		  User.findById(req.params.id, function(err, user) {
-		        
-		    	if (!user) { 
-	  	    	  	req.flash('error','Unable to locate the user to delete!');
-		    		res.render('404'); 
-		    		return false; 
-		    	};
-		    		    
-		    	user.remove(function(err) {
-	    		  if(err) {
-	    	    	  req.flash('error','There was an error deleting the user!');
-	    			  res.send('false');
-	    		  } else {
-	    	    	  req.flash('info','Friend deleted');
-	    			  res.send('true');
-	    		  }    	          
-	   	      	}); 
-		  });
-		  
+		req.flash('error','no delete method on friends!');
+		res.send('false');
 	}
 	
 };

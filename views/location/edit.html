@@ -1,0 +1,24 @@
+<h1>Location.edit</h1>
+
+<p><%- JSON.stringify(content.location) %></p>
+
+<form action="/location/<%= content.location.id %>" method="post">
+	
+	<input type="hidden" name="_method" value="put" />
+	<input type="text" name="name" value="<%= content.location.name %>" placeholder="Location Name" />
+	<input type="text" name="url" value="<%= content.location.url %>" placeholder="Website" />
+	<input type="text" name="description" value="<%= content.location.description %>" placeholder="Description" />
+	<input type="text" name="address" value="<%= content.location.address %>" placeholder="Address" />
+
+	<button class="button-submit" type="submit" value="Update">update</button>
+  	<a class="button-cancel" href="/location/<%= content.location.id %>">Cancel</a>
+	
+</form>
+
+<hr>
+
+<form action="/location/<%= content.location.id %>" method="delete">
+	<label><%= content.location.name %></label>
+	<button type="submit">Delete location</button>
+</form>
+

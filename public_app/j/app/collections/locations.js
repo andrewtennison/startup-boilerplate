@@ -8,7 +8,7 @@ define([
 	'appConfig',
 	'models/location'
 ], function($, _, Backbone, config, LocationModel){
-	
+
 	var Locations = Backbone.Collection.extend({
 		model: LocationModel,
 		url: config.root + '/location'

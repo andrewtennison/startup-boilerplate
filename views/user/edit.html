@@ -1,0 +1,20 @@
+<h1>user.edit</h1>
+
+<form action="/user/<%= content.user.id %>" method="post">
+	
+	<input type="hidden" name="_method" value="put" />
+	<input type="text" name="displayName" value="<%= content.user.displayName %>" placeholder="display name" />
+	<input type="text" name="email" value="<%= content.user.email %>" placeholder="email address" />
+
+	<p>Created: <%= content.user.date.created %></p>
+	<p>You have logged in: <%= content.user.visits %> times</p>
+	<p>Friends: <%= content.user.friends %></p>
+	<p>Facebook UID: <%= content.user.fb_uid %></p>
+	<p>Status: <%= content.user.status %></p>
+
+	<button class="button-submit" type="submit" value="Update">update</button>
+  	<a class="button-cancel" href="/user/<%= content.user.id %>">Cancel</a>
+	
+</form>
+
+<hr>

@@ -1,0 +1,44 @@
+<h1>Location.show</h1>
+
+<script type="text/javascript" src="/j/libs/jquery/jquery-min.js"></script>
+<script type="text/javascript">
+	$(function(){
+
+		// Delete User
+		$('.button-delete').click(function(e){
+			e.preventDefault();
+			
+			var ID = this.id;
+			$.ajax({
+				type: "DELETE",
+				url: "/location/" + ID,				   
+				success: function(msg) {				   	  
+					window.location.replace("/location");
+				},
+				error: function(msg) {					  
+					alert("I was unable to delete the test - something has gone wrong, apologies!");
+				}
+			});
+		});
+		
+	});
+</script>
+
+
+<p>Render HTML to have current location shown (for seo purposes)</p>
+<p>
+Backbone calls /location/:id route, this then needs to set the display to be the same as if navigated to, and try and load additional data in background.
+Backbone will need to check when hitting route if bootstrap JSON = path="/location" or content on page, then it will know it was native, rather than navigated to so wont try an fetch the data again.
+Possibly use bootstrap to populate model
+</p>
+
+<p><%- JSON.stringify(content) %></p>
+
+<a href="/location/<%= content.location.id %>/edit">Edit location</a>
+<button class="button-delete" id="<%= content.location.id %>"  title="Delete test ...">Delete</button>
+
+
+
+
+
+

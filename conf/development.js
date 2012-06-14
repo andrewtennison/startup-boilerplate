@@ -14,8 +14,10 @@ module.exports = function(app,express) {
 		facebook: {
 			app_id:'237429156359045',
 			app_secret:'47162acfe0016699b9b5c4eb6cada390'
-		}
+		},
+
+		fayeEndpoint: 'http://dev.onside.me:3000/bayeux'
+
 	}
 	
 }
-

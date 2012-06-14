@@ -1,4 +1,9 @@
 // Use this as a quick template for future modules
+
+/*
+ * I think the purpose of this is to manage creation of new views, and clean up any old views when a new view is created 
+ */
+
 define([
 	'jquery',
 	'underscore',
@@ -7,6 +12,8 @@ define([
 ], function($, _, Backbone, Events){
 	var views = {};
 	var create = function (context, name, View, options) {
+		console.log('VM.create')
+
 		// View clean up isn't actually implemented yet but will simply call .clean, .remove and .unbind
 		if(typeof views[name] !== 'undefined') {
 			views[name].undelegateEvents();
@@ -24,7 +31,6 @@ define([
 		} else {
 			context.children[name] = view;
 		}
-		
 		Events.trigger('viewCreated');
 		return view;
 	}

@@ -1,1 +1,35 @@
-<h1>Location</h1>
+<h1>Location.index</h1>
+<%- partial('../messages') %>
+
+<% if(content.locations) { %>
+<ul>
+	<% for(var i=0; i < content.locations.length; i++) { %>
+	<li>name: <%= content.locations[i].name %> / id: <%= content.locations[i].id %> - <a href="/location/<%= content.locations[i].id %>">see</a> / <a href="/location/<%= content.locations[i].id %>/edit">edit</a></li>
+	<% } %>
+</ul>
+<% } else { %>
+<p>No locations</p>
+<% } %>
+
+<hr />
+
+<% if(content.flash.error){ %>
+	<p><%- content.flash.error %></p>
+<% } else if(content.flash.info){ %>
+	<p><%- content.flash.info %></p>
+<% } %>
+
+<p>messages - <%- messages() %></p>
+
+
+<form action="/location" method="post" name="location">
+	<h2>Add new location</h2>
+	<input type="text" name="name" value="" placeholder="Location Name" />
+	<input type="text" name="url" value="" placeholder="Website" />
+	<input type="text" name="description" value="" placeholder="Description" />
+	<input type="text" name="address" value="" placeholder="Address / postcode" />
+
+	<button type="submit">Add location</button>
+	<button type="reset">Reset</button>
+	
+</form>

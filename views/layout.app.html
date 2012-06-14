@@ -52,8 +52,12 @@
 	<meta property="og:url" content="http://onside.me"/>
 	-->
 	<!-- Main Stylesheet -->
+	<link rel="stylesheet" href="/c/main.css" />
 	
+	<!-- Main JS -->
+	<script src="/bayeux/client.js"></script>
 	<script data-main="/j/app/main" src="/j/libs/require/require.js"></script>
+	
 	
 	
 </head>
@@ -61,15 +65,20 @@
 <body>
 	<div id="fb-root"></div>
 
-	<nav>
-		<a href="/home">Home</a>
-		<a href="/user">User</a>
-		<a href="/location">Location</a>
-		<a href="/logout">Logout</a>
-		<a href="/friend">Friend</a>
-	</nav>
+	<header id="masthead">
+		<h1>Fancy a pint?</h1>
+		<a href="/logout">logout</a>
+	</header>	
 	
 	<%- body %>
-	
+
+	<nav id="navPrimary">
+		<a class="iconHome" href="/home">Home</a>	
+		<a class="iconSettings" href="/user">User</a>	
+		<a class="iconLocation" href="/location">Locations</a>	
+		<a class="iconFriend" href="/friend">Friends</a>	
+		<a class="iconMap" href="/map">Map</a>	
+	</nav>	
+
 </body>
 </html>

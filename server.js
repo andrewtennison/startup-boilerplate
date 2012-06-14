@@ -5,23 +5,21 @@ var app,
 	fs			= require('fs'),
 	express		= require('express'),
 	util		= require('util'),
+	SessionMongoose = require("session-mongoose"),
 	mongoose	= require('mongoose'),
 	logging		= require('node-logging'),
 	stylus		= require('stylus'),
 	nib			= require('nib'),
-	passport	= require('passport'),
-	LocalStrategy = require('passport-local').Strategy;
-	
-/*
-SessionMongoose = require("session-mongoose");
+	passport	= require('passport');
+
+
 var mongooseSessionStore = new SessionMongoose({
 	url: "mongodb://localhost/session",
-	interval: 120000 // expiration check worker run interval in millisec (default: 60000)
+	interval: 6000 // expiration check worker run interval in millisec (default: 60000)
 });
-*/
 
 mongoose.connect('mongodb://localhost/boilerplate');
-
+mongoose.connection.on('error', console.error);
 
 // Initial bootstrapping
 exports.boot = function(params){
@@ -36,33 +34,35 @@ exports.boot = function(params){
 	bootApplication(app);
 	bootModels(app);
 	bootControllers(app);
+	bootFaye(app);
 
 	return app;
 };
 
-
-function bootApplication(app) {	 
+function compileStylus (str, path) {
+	return stylus(str)
+		.set('filename', path)
+		.set('compress', false)
+		.use(nib());
+}
+function bootApplication(app) {
 	app.use(express.bodyParser());
 	app.use(express.methodOverride());
 	app.use(express.cookieParser());
 
 	// before sessions to prevent passport.deserializeUser being called for static assets
 	app.use(express.static(app_root + '/public_app'));
-	app.use(express.session({ secret: 'changeSecret' }));
-//	app.use(express.session({store: new MemcachedStore({ hosts: ['127.0.0.1:11211'] }), secret: 'changeSecret' }));
+	app.use(express.session({
+		secret: "changeSecret",
+		maxAge: new Date(Date.now() + 3600000), 
+		store: mongooseSessionStore 
+    }));
+
 	app.use(passport.initialize());
 	app.use(passport.session());
 
-	app.use(stylus.middleware({
-		src: __dirname + '/public_app',
-		compile: function (str, path) {
-			return stylus(str).set('filename', path).set('compress', true).use(nib()).import('nib');;
-		}
-	}));
-
 	// dynamic router
 	app.use(app.router);
-
 	app.use(express.logger());
 	app.use(logging.requestLogger);
 
@@ -86,6 +86,7 @@ function bootApplication(app) {
 	// Some dynamic view helpers
 	app.dynamicHelpers({
 		request: function(req){ return req; },
+		//user: function(req){ return req.user; },
 		hasMessages: function(req){ return Object.keys(req.session.flash || {}).length; },
 		messages: function(req){
 			return function(){
@@ -127,7 +128,6 @@ function bootControllers(app) {
 		files.forEach(function(file){			
 			bootController(app, file);				
 		});
-	
 	});
 	
 	require(app_root + '/controllers/AppController')(app);			// Include
@@ -151,6 +151,11 @@ function bootController(app, file) {
 	
 	// Include the controller
 	//require(controller)(app,template);			// Include
+}
+
+function bootFaye(app) {
+	var bayeux = require(app_root + '/utils/faye');
+	bayeux.attach(app);
 }
 
 

@@ -1,14 +1,15 @@
 var fs = require('fs'),
-	inflection = require('../lib/inflection');
-	
+	inflection = require('../lib/inflection'),
+	bayeux = require('../utils/faye');
 
 module.exports = function(app) {
-	
 	// app.get("/favicon.ico", function() {}); // Required if you delete the favicon.ico from public
-	
+
 	app.get('/auth/:action/:callback', authRouter, authCallback);
 	app.get('/auth/:action', authRouter);
 	app.get('/logout', function(req, res){
+		// destroy FAYE client
+		bayeux.getClient().disconnect();
 		req.logOut();
 		res.redirect('/');
 	});
@@ -30,29 +31,11 @@ module.exports = function(app) {
 	
 }
 
-//app.get("/:controller?", ensureAuthenticated, router);
-function ensureAuthenticated(req, res, next) {
-	if (req.isAuthenticated()) { return next(); }
-	res.redirect('/', {message:'not logged in', status:401})
-}
 
-function andRestrictToSelf(req, res, next) {
-	req.authenticatedUser.id == req.user.id
-	? next()
-	: next(new Error('Unauthorized'));
-}
-function andRestrictTo(role) {
-	return function(req, res, next) {
-		req.authenticatedUser.role == role
-		? next()
-		: next(new Error('Unauthorized'));
-	}
-}
-
-
+// Routing for 3rd party authentication
 function authCallback(req, res){
 	authRouter(req, res, false)
-}
+};
 
 function authRouter(req, res, next){
 	var controller = 'auth';
@@ -92,6 +75,8 @@ function authRouter(req, res, next){
 	}
 };
 
+
+// Primary router
 function router(req, res, next) {
 	var controller = req.params.controller ? req.params.controller : '';
 	var action = req.params.action ? req.params.action : '';
@@ -103,7 +88,7 @@ function router(req, res, next) {
 	if(controller.length == 0) {
 		index(req,res,next);
 		return;
-	}		
+	}
 	
 	// Determine the function to call based on controller / model and method
 	if(id.length == 0) {
@@ -125,11 +110,7 @@ function router(req, res, next) {
 		// Controller name is now singular, need to switch it back 
 		switch(method) {
 			case 'get':
-				if(action.length > 0) {
-					fn = action;
-				} else {
-					fn = 'show';
-				}
+				fn = (action.length > 0) ? action : 'show';
 				break;
 			case 'put':
 				fn = 'update';
@@ -139,23 +120,17 @@ function router(req, res, next) {
 				break;		
 		}		
 	}
-	
 	console.log('controllerLibrary = ./' + controller.capitalize() + 'Controller')
 	
 	try {
-		var controllerLibrary = require('./' + controller.capitalize() + 'Controller');
-		
-		// if(typeof controllerLibrary[fn] === 'object'){
-			// var options = controllerLibrary[fn].middlewhere;
-			// // run middlewhere dependent on options. 
-			// // finally run controllerLibrary[fn].init
-		// }
+		var controllerName = './' + controller.capitalize() + 'Controller',
+			controllerLibrary = require(controllerName);
 		
 		if(typeof controllerLibrary[fn] === 'function') {
-			console.log('call '+controllerLibrary+' function')
+			console.log('call '+controllerName+' function')
 			controllerLibrary[fn](req,res,next);		
 		} else {
-			console.log(controllerLibrary+' not function')
+			console.log(controllerName+' not function')
 			//res.render('404');
 			res.send(404)
 		}
@@ -174,31 +149,9 @@ function router(req, res, next) {
  * @param res
  */
 
+
 function index(req, res, next) {
-		 
-	/**
-	 * If you want to redirect to another controller, uncomment
-	 */
-	// res.redirect('/controllerName');
-	
-	var controllers = [];
-	
 	console.log('AppController.index')
-	fs.readdir(__dirname + '/', function(err, files){
-
-		if (err) throw err;
-
-		files.forEach(function(file){
-			if(file != "AppController.js") {
-				controllers.push(file.replace('Controller.js','').toLowerCase());
-			}
-		});
-
-		var data = {
-			controllers:controllers, 
-			user: req.user
-		};
-		res.render('app', {content:data});
-	
-	});	
+	var content = {};
+	res.render('app', {content:content, user:req.user});
 };

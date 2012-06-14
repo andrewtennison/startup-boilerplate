@@ -1,0 +1,35 @@
+<h1>User.show</h1>
+
+<script type="text/javascript" src="/j/libs/jquery/jquery-min.js"></script>
+<script type="text/javascript">
+	$(function(){
+
+		// Delete User
+		$('.button-delete').click(function(e){
+			e.preventDefault();
+			
+			var ID = this.id;
+			$.ajax({
+				type: "DELETE",
+				url: "/user/" + ID,				   
+				success: function(msg) {				   	  
+					window.location.replace("/user");
+				},
+				error: function(msg) {					  
+					alert("I was unable to delete the test - something has gone wrong, apologies!");
+				}
+			});
+		});
+		
+	});
+</script>
+
+<p>friends: <%- JSON.stringify(content.user.friends) %></p>
+<hr />
+<p>status: <%- JSON.stringify(content.user.status) %></p>
+<hr />
+<!--p><%- JSON.stringify(content.user) %></p-->
+
+<a href="/user/<%= content.user.id %>/edit">Edit user</a>
+<button class="button-delete" id="<%= content.user.id %>"  title="Delete test ...">Delete</button>
+

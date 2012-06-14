@@ -1,17 +1,63 @@
-<h1>Friends already on Fancy A...</h1>
+<%- JSON.stringify(content.grouped) %>
+
+<script type="text/javascript">
+	AppJson = {
+		user: <%- JSON.stringify(user) %>,
+		friends: <%- JSON.stringify(content.friends) %>,
+		grouped: <%- JSON.stringify(content.grouped) %>
+	};
+</script>
+
+<section id="friend" class="page">
+
+	<% for(var key in content.grouped) {%>
+	<section class="box">
+		<header>
+			<h1>Status = <%= key %></h1>
+		</header>
+		<ul>
+		<% for(var i=0; i < content.grouped[key].length; i++) {%>
+			<li>
+				<img src="http://graph.facebook.com/<%= content.grouped[key][i].fb_uid %>/picture" />
+				<%= content.grouped[key][i].displayName %> : <%= content.grouped[key][i].id %> : <%= content.grouped[key][i].status %>
+				<em><%- JSON.stringify(content.grouped[key][i]) %></em>
+				<br />
+				<% if(key === 'invited'){ %>
+					<a class="accept" href="/friend/<%= content.grouped[key][i].id %>/accept">Accept invite</a>
+					<a class="reject" href="/friend/<%= content.grouped[key][i].id %>/reject">Reject invite</a>
+				<% } %>
+
+				<% if(key === 'none'){ %>
+					<a class="invite" href="/friend/<%= content.grouped[key][i].id %>/invite">invite friend</a>
+				<% } %>
+			</li>
+		<% } %>
+		</ul>
+	</section>
+	<% } %>
+
+	<!--h2>Users not yet stuck in</h2>
+	<a href="">Invite some friends</a>
 
 
-<ul>
-<% for(var i=0; i < content.fb_friends.length; i++) {%>
-	<li>
-   		<%= content.fb_friends[i].displayName %> <a href="/user/<%= content.fb_friends[i].id %>/add">Add</a>
-	</li>
-<% } %>
-</ul>
+	<section id="friends" class="box">
+		<h1>Invites</h1>
+		<ol></ol>
+	</section>
 
-<h2>Users not yet stuck in</h2>
-<a href="">Invite some friends</a>
+	<section id="invites" class="box">
+		<h1>Invites</h1>
+		<ol></ol>
+	</section>
 
-<hr />
+	<section id="people you may know" class="box">
+		<h1>Invites</h1>
+		<ol></ol>
+	</section>
 
-<%- JSON.stringify(content) %>
+	<section id="blocked" class="box">
+		<h1>Invites</h1>
+		<ol></ol>
+	</section-->
+
+</section>
