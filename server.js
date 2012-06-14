@@ -10,8 +10,8 @@ var app,
 	logging		= require('node-logging'),
 	stylus		= require('stylus'),
 	nib			= require('nib'),
-	passport	= require('passport'),
-	LocalStrategy = require('passport-local').Strategy;
+	passport	= require('passport');
+
 
 var mongooseSessionStore = new SessionMongoose({
 	url: "mongodb://localhost/session",
@@ -34,6 +34,7 @@ exports.boot = function(params){
 	bootApplication(app);
 	bootModels(app);
 	bootControllers(app);
+	bootFaye(app);
 
 	return app;
 };
@@ -49,21 +50,8 @@ function bootApplication(app) {
 	app.use(express.methodOverride());
 	app.use(express.cookieParser());
 
-	// app.use(stylus.middleware({
-		// debug: true,
-    	// force: true,
-// //    	firebug: true,
-// //    	linenos: true,
-    	// src: __dirname + '/views/stylesheets',
-		// dest: __dirname + '/public_app',
-		// compile: compileStylus
-	// }));
-
 	// before sessions to prevent passport.deserializeUser being called for static assets
 	app.use(express.static(app_root + '/public_app'));
-//	app.use(express.session({ secret: 'changeSecret' }));
-//	app.use(express.session({cookie: { path: '/', httpOnly: true}, secret:'changeSecret'})); //, maxAge: null
-//	app.use(express.session({store: new MemcachedStore({ hosts: ['127.0.0.1:11211'] }), secret: 'changeSecret' }));
 	app.use(express.session({
 		secret: "changeSecret",
 		maxAge: new Date(Date.now() + 3600000), 
@@ -140,7 +128,6 @@ function bootControllers(app) {
 		files.forEach(function(file){			
 			bootController(app, file);				
 		});
-	
 	});
 	
 	require(app_root + '/controllers/AppController')(app);			// Include
@@ -164,6 +151,11 @@ function bootController(app, file) {
 	
 	// Include the controller
 	//require(controller)(app,template);			// Include
+}
+
+function bootFaye(app) {
+	var bayeux = require(app_root + '/utils/faye');
+	bayeux.attach(app);
 }
 
 

@@ -7,7 +7,9 @@ var mongoose = require('mongoose'),
 	User = mongoose.model('User'),
 	ViewTemplatePath = 'friend',
 	request = require('request'),
-	async = require('async');
+	async = require('async'),
+	bayeux = require('../utils/faye');
+
 
 module.exports = {
 
@@ -42,6 +44,16 @@ module.exports = {
 //		User.getFacebookFriends(req.user, function(user){
 
 		User.synFriendsList(req.user, function(user){
+
+			// bind client to subscriptions from friends
+			user._friends.forEach(function(friend){
+				if(bayeux.getClient()._channels._channels && !bayeux.getClient()._channels._channels['/status/' + friend._id]){
+					bayeux.getClient().subscribe('/status/' + friend._id, function(msg){
+						console.log('>>>>>>>>>>>>>>>>>>>> FriendController.index > '+req.user.displayName+' > subscriber - /status/' + friend._id + ' >> ' + msg.user + ' <<<<<<<<<<<<<<<<<<<<');
+					})
+				}
+			});
+
 
 			var data = {
 				friends : [], //user.friends,

@@ -6,7 +6,9 @@
 var mongoose = require('mongoose'),	
 	User = mongoose.model('User'),
 	ViewTemplatePath = 'user',
-	statusValues = require('../lib/statusValues');
+	statusValues = require('../lib/statusValues'),
+	bayeux = require('../utils/faye');
+
 
 function findInArray(arr, prop, value){
 	var l = arr.length;
@@ -113,9 +115,12 @@ module.exports = {
 
 		user.status = newStatus;
         user.save(function(err) {
-			(err)
-				? res.send({error:err})
-				: res.send(newStatus);
+			if(err){
+				res.send({error:err})
+			}else{
+				bayeux.getClient().publish('/status/' + req.user._id, {user: req.user._id, status:newStatus})
+				res.send(newStatus);
+			}
 		});
 	},
 	  

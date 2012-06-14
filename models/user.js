@@ -105,8 +105,9 @@ User.static('synFriendsList', function(reqUser, callback){
 
 	var Model = this;
 
-	Model.getFacebookFriends(reqUser, function( fb_friends ){
-		reqUser.fb_friends = fb_friends;
+	// Model.getFacebookFriends(reqUser, function( fb_friends ){
+	// 	reqUser.fb_friends = fb_friends;
+		var fb_friends = reqUser.fb_friends;
 
 		var friendIds = _.pluck(reqUser.friends, '_id'),
 			diff = _.without(fb_friends, friendIds);
@@ -117,7 +118,6 @@ User.static('synFriendsList', function(reqUser, callback){
 		.select('displayName fb_uid')
 		.run(function(err, docs){
 			console.log('Get Matching Users from FB_UID');
-			console.log(docs);
 
 			docs.forEach(function(doc){ reqUser._friends.push(doc._id) });
 
@@ -130,7 +130,7 @@ User.static('synFriendsList', function(reqUser, callback){
 				})
 			})
 		}) // END run 
-	}) // END getFacebookFriends
+	// }) // END getFacebookFriends
 });
 
 
@@ -144,7 +144,6 @@ User.static('populateFriends', function(reqUser, callback){
 	.populate('_friends', ['status', 'displayName', 'fb_uid', 'photo'])
 	.run(function (err, user) {
 		console.log('user populated')
-		console.log(user._friends)
 		callback(user)
 	})
 });

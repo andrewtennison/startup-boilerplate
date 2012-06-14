@@ -9,6 +9,33 @@ define([
 	'views/home/index',
 ], function ($, _, Backbone, Vm, Config, AppStateModel, AppView) {
 	var appState; // scope global to file, set in init
+
+	var setupFaye = function(appState){
+
+		//Faye.Logging.logLevel = 'debug';
+		var client = new Faye.Client('/bayeux', {timeout: 120});
+
+		client.bind('disconnect', function(clientId) {
+			console.log('[ DISCONNECT] ' + clientId);
+		});
+
+		client.bind('transport:down', function() {
+			console.log('[CONNECTION DOWN]');
+		});
+		client.bind('transport:up', function() {
+			console.log('[CONNECTION UP]');
+		});
+
+		client.subscribe('/status/*', function(msg) {
+			console.info('/status/*');
+			console.info(msg);
+			var model = appState.get('friends').get(msg.user);
+			if(model) model.set({status:msg.status})
+		});
+
+	};
+
+
 	
 	var AppRouter = Backbone.Router.extend({
 		routes: {
@@ -16,6 +43,7 @@ define([
 			'/location/:id' : 'getLocation',
 			'*actions': 'defaultAction' // All urls will trigger this route
 		},
+
 		initialize: function(){
 			// in init() define all views required on ALL page loads. Unique views can be defined in routes
 			
@@ -35,6 +63,8 @@ define([
 			
 			// Views
 			var appView = Vm.create({}, 'AppView', AppView, {appState:appState});
+
+			setupFaye(appState)
 		},
 		
 		getFriends: function(){

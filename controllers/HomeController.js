@@ -16,7 +16,7 @@ module.exports = {
 			res.redirect('/');
 			return;
 		}
-		
+
 		var status = req.user.status;
 
 		res.render(ViewTemplatePath, {layout: 'layout.app.html', content:statusValues, user:req.user});

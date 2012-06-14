@@ -4,11 +4,10 @@ define([
 	'underscore',
 	'backbone',
 	'events',
-	'text!templates/friend.item.html'
-], function($, _, Backbone, Events, friendItemTpl){
+	'views/home/friendItem'
+], function($, _, Backbone, Events, FriendItemView){
 	var FriendView = Backbone.View.extend({
 		el: '#friends',
-		template: _.template(friendItemTpl),
 		initialize: function(){
 			console.info('FriendView.init');
 			var AppState = this.options.appState;
@@ -23,10 +22,12 @@ define([
 		events: {},
 		addOne: function(item, index){
 			console.log('FriendView.addOne')
-			console.log(item.toJSON())
+
 			// check for title attribute on status + if not expired
-			//if( !item.get('status').title ) return;
-			this.$('ol').append(this.template( item.toJSON() ));
+			// //if( !item.get('status').title ) return;
+
+			var view = new FriendItemView({model:item, appState:this.options.appState});
+			this.$el.append(view.render().el);
 		},
 		addAll: function(){
 			console.log('FriendView.addAll')

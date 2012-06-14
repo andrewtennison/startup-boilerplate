@@ -31,6 +31,7 @@
 		"bcrypt" : "",
 		"stylus" : "",
 		"nib" : "",
-		"async" : ""
+		"async" : "",
+		"faye" : ""
 	}
 }

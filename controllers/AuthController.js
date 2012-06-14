@@ -22,6 +22,7 @@ passport.use(new FacebookStrategy({
 				if (err) 	return done(err);
 				if (!user)  return done(null, false, { message: 'Unknown user' });
 			  	//if (!user.validPassword(password)) return done(null, false, { message: 'Invalid password' });
+
 			  	user.accessToken = accessToken;
 			  	if(user.isNew) return done(null, user, {message: 'New user'});
 				return done(null, user);

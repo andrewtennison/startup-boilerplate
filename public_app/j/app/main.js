@@ -18,6 +18,9 @@ require.config({
 		// external
 		facebook: 'http://connect.facebook.net/en_US/all',
 
+		// FAYE > pubsub messaging
+		faye:'http://dev.onside.me/bayeux/client',
+
 		// templates folder
 		templates: '../../t'
 	},

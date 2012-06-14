@@ -1,12 +1,15 @@
 var fs = require('fs'),
-	inflection = require('../lib/inflection');
+	inflection = require('../lib/inflection'),
+	bayeux = require('../utils/faye');
 
 module.exports = function(app) {
 	// app.get("/favicon.ico", function() {}); // Required if you delete the favicon.ico from public
-	
+
 	app.get('/auth/:action/:callback', authRouter, authCallback);
 	app.get('/auth/:action', authRouter);
 	app.get('/logout', function(req, res){
+		// destroy FAYE client
+		bayeux.getClient().disconnect();
 		req.logOut();
 		res.redirect('/');
 	});
@@ -145,6 +148,7 @@ function router(req, res, next) {
  * @param req
  * @param res
  */
+
 
 function index(req, res, next) {
 	console.log('AppController.index')
