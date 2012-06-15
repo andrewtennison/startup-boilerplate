@@ -10,10 +10,14 @@ require.config({
 		// Require.js plugins
 		text: '/j/libs/require/text',
 		order: '/j/libs/require/order',
+		async: '/j/libs/require/async', // https://github.com/millermedeiros/requirejs-plugins
 
 		// load config file - this could be dependent on environment 
 		// appConfig: ( window.bootstrapJson.env === 'development')? 'config/development' : 'config/production',
 		appConfig: 'config/development',
+
+		// Async load google maps
+		google: '/j/libs/google/googleMaps',
 				
 		// external
 		facebook: 'http://connect.facebook.net/en_US/all',

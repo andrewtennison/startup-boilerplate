@@ -53,3 +53,6 @@ label.error:before {content: attr(data-content); position:absolute; top:-20px; h
 #status h1 {font-size:15px; display:inline-block; padding:10px 0 10px 70px}
 #status img {position:absolute; left:10px; top:10px; box-shadow:0 0 2px #000}
 #status p {display:inline-block}
+
+
+#map_canvas {width:400px; height:400px;}
